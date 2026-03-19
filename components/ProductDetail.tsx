@@ -32,7 +32,8 @@ import {
   getVariantMatrix,
   getProductById,
 } from "@/lib/products";
-import { getCompatibleProducts } from "@/lib/compatibility";
+import { useCompatibility } from "@/lib/useCompatibility";
+import { MAX_PER_GROUP, type ScoredProduct } from "@/lib/compatibility";
 import { useQuoteStore } from "@/lib/store";
 import { formatPrice, cn } from "@/lib/utils";
 import { getBrandInfo } from "@/lib/brands";
@@ -164,7 +165,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   // -- derived data ---------------------------------------------------------
   const brandInfo = getBrandInfo(product.brand);
   const related = getRelatedProducts(product);
-  const compatibleGroups = useMemo(() => getCompatibleProducts(product), [product]);
+  const { groups: compatibleGroups, isLoading: compatLoading, source: compatSource } = useCompatibility(product);
   const description = getDescription(product);
 
   // Use activeProduct for price and display, but fall back to parent data
@@ -270,10 +271,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
         available: specEntries.length > 0 || warrantyEntries.length > 0,
       },
       { id: "resources", label: "Resources", available: hasResources },
-      { id: "compatible", label: "Compatible", available: compatibleGroups.length > 0 },
+      { id: "compatible", label: "Compatible", available: compatibleGroups.length > 0 || compatLoading },
       { id: "related", label: "Related", available: related.length > 0 },
     ],
-    [specEntries, warrantyEntries, hasResources, compatibleGroups, related]
+    [specEntries, warrantyEntries, hasResources, compatibleGroups, compatLoading, related]
   );
 
   // -- effects --------------------------------------------------------------
@@ -946,16 +947,31 @@ export function ProductDetail({ product }: ProductDetailProps) {
         )}
 
         {/* -------- Compatible Products Tab -------- */}
-        {compatibleGroups.length > 0 && (
+        {(compatibleGroups.length > 0 || compatLoading) && (
           <section
             ref={(el) => { sectionRefs.current.compatible = el; }}
             id="tab-compatible"
           >
-            <h2 className="text-xl font-bold text-navy-800 mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
               <Package className="w-5 h-5" />
               Compatible Products
             </h2>
-            <Accordion.Root type="multiple" defaultValue={compatibleGroups.map((g) => g.category)} className="space-y-3">
+            <p className="text-sm text-gray-500 mb-6">
+              Products that fit and work with this item based on dimensions and series.
+            </p>
+
+            {compatLoading && compatibleGroups.length === 0 && (
+              <div className="flex items-center gap-2 text-sm text-gray-400 py-8 justify-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-amber-500" />
+                Finding compatible products…
+              </div>
+            )}
+
+            <Accordion.Root
+              type="multiple"
+              defaultValue={compatibleGroups.map((g) => g.category)}
+              className="space-y-3"
+            >
               {compatibleGroups.map((group) => (
                 <Accordion.Item
                   key={group.category}
@@ -964,10 +980,10 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 >
                   <Accordion.Header>
                     <Accordion.Trigger className="flex items-center justify-between w-full px-5 py-4 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors group">
-                      <span>
+                      <span className="flex items-center gap-2">
                         {group.category}
-                        <span className="text-gray-400 font-normal ml-2">
-                          ({group.totalCount} product{group.totalCount !== 1 ? "s" : ""})
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                          {group.totalCount}
                         </span>
                       </span>
                       <ChevronDown className="w-4 h-4 text-gray-400 transition-transform group-data-[state=open]:rotate-180" />
@@ -975,14 +991,23 @@ export function ProductDetail({ product }: ProductDetailProps) {
                   </Accordion.Header>
                   <Accordion.Content className="overflow-hidden">
                     <div className="px-5 pb-5">
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {group.products.map((p) => (
-                          <ProductCard key={p.id} product={p} />
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+                        {group.products.map((sp) => (
+                          <div key={sp.product.id} className="relative">
+                            <ProductCard product={sp.product} />
+                            {sp.score >= 90 && (
+                              <div className="absolute top-2 right-2 z-10">
+                                <Badge variant="default" className="bg-green-600 text-white text-[10px] px-1.5 py-0.5">
+                                  Best Match
+                                </Badge>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
-                      {group.totalCount > 4 && (
+                      {group.totalCount > MAX_PER_GROUP && (
                         <p className="text-xs text-gray-400 mt-3 text-center">
-                          Showing 4 of {group.totalCount} — browse the catalog for more
+                          Showing {group.products.length} of {group.totalCount} — browse the catalog for more
                         </p>
                       )}
                     </div>
