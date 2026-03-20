@@ -25,7 +25,7 @@ export function useCompatibility(product: Product): UseCompatibilityResult {
 
   useEffect(() => {
     // Only call Orca if we have a SKU and local results are thin
-    if (!product.sku || localGroups.length >= 3) return;
+    if (!product.sku || localGroups.length >= 2) return;
 
     let cancelled = false;
     setIsLoading(true);
