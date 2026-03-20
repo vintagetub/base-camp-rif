@@ -11,7 +11,7 @@ export interface ScoredProduct {
 }
 
 export interface CompatibleGroup {
-  category: string;       // Display label for the group
+  category: string;
   products: ScoredProduct[];
   totalCount: number;
 }
@@ -22,7 +22,6 @@ export interface CompatibleGroup {
 
 const MAX_PER_GROUP = 6;
 
-/** Product types that are already complete systems */
 const KIT_TYPES = new Set([
   "Shower Door and Base",
   "Shower Door, Base and Walls",
@@ -30,39 +29,68 @@ const KIT_TYPES = new Set([
   "Shower Kit",
 ]);
 
-/**
- * Cross-category compatibility rules.
- * Key = source normalized type, Value = types that CAN appear as recommendations.
- */
-const CROSS_CATEGORY_RULES: Record<string, string[]> = {
-  "Shower Bases":       ["Shower Doors", "Shower Enclosures", "Wall", "Fixtures"],
-  "Shower Doors":       ["Shower Bases", "Wall", "Fixtures"],
-  "Tub Doors":          ["Bathtubs"],
-  "Shower Enclosures":  ["Shower Bases", "Wall", "Fixtures"],
-  "Wall":               ["Shower Bases", "Shower Doors", "Shower Enclosures"],
-  "Bathtubs":           ["Wall", "Tub Doors", "Fixtures"],
-  "Showers":            ["Wall", "Shower Doors", "Fixtures"],
-  "Fixtures":           [],  // Fixtures are shown FOR others, not the other way around
-};
+// ---------------------------------------------------------------------------
+// Bathtub Sub-Type Detection
+// ---------------------------------------------------------------------------
+
+type BathtubInstall = "alcove" | "freestanding" | "drop-in" | "corner" | "unknown";
+
+function getBathtubInstall(p: Product): BathtubInstall {
+  const name = (p.name || "").toLowerCase();
+  const inst = (p.installationType || "").toLowerCase();
+
+  if (inst === "freestanding" || /freestanding/.test(name))  return "freestanding";
+  if (inst === "drop-in" || /drop.?in/.test(name))           return "drop-in";
+  if (inst === "corner" || /\bcorner\b/.test(name))          return "corner";
+  if (inst === "alcove" || inst === "3-wall alcove" || /alcove/.test(name)) return "alcove";
+
+  // Default: if it has standard 60in width dims, likely alcove (most common)
+  return "unknown";
+}
+
+// ---------------------------------------------------------------------------
+// Installation Geometry (Shower-Side)
+// ---------------------------------------------------------------------------
+
+type Geometry = "neo-angle" | "standard";
+
+function getGeometry(p: Product): Geometry {
+  const name = (p.name || "").toLowerCase();
+  if (/neo.?angle/.test(name)) return "neo-angle";
+  // Corner installationType on enclosures also means neo-angle
+  if ((p.installationType || "").toLowerCase() === "corner" &&
+      /enclosure/i.test(p.name || "")) return "neo-angle";
+  return "standard";
+}
+
+function isGeometryCompatible(a: Geometry, b: Geometry): boolean {
+  if (a === "neo-angle" || b === "neo-angle") return a === b;
+  return true;
+}
 
 // ---------------------------------------------------------------------------
 // Product Type Normalization
 // ---------------------------------------------------------------------------
 
-/**
- * Resolve the effective product type from category → productType → name inference.
- * Returns a canonical type string used for cross-category rule lookups.
- */
+function isTubDoor(p: Product): boolean {
+  return /tub\s*(door|enclosure)/i.test(p.name || "");
+}
+
+function isBathtub(type: string): boolean {
+  return type === "Bathtubs" || type === "Tub/Shower Combo";
+}
+
 function getNormalizedType(p: Product): string {
-  // 1. Use category if populated
+  // Tub door detection takes priority (they're often miscategorized)
+  if (isTubDoor(p)) return "Tub Doors";
+
+  // Use category if populated
   if (p.category && p.category !== "Uncategorized") {
-    // Special case: detect tub doors that are miscategorized as shower doors
-    if (p.category === "Shower Doors" && isTubDoor(p)) return "Tub Doors";
     if (p.category === "Tub Door") return "Tub Doors";
     return p.category;
   }
 
-  // 2. Map productType to canonical category
+  // Map productType
   const typeMap: Record<string, string> = {
     "Shower Door":                     "Shower Doors",
     "Shower Enclosure":                "Shower Enclosures",
@@ -73,71 +101,100 @@ function getNormalizedType(p: Product): string {
     "Shower Enclosure, Base and Backwalls": "Shower Enclosure and Base",
     "Bathtub":                         "Bathtubs",
     "Tub":                             "Bathtubs",
-    "Tub Shower":                      "Bathtubs",
+    "Tub Shower":                      "Tub/Shower Combo",
     "Backwall":                        "Wall",
     "Shower Head":                     "Fixtures",
     "Sinks":                           "Sinks",
     "Home Spa":                        "Bathtubs",
   };
 
-  if (p.productType && typeMap[p.productType]) {
-    const mapped = typeMap[p.productType];
-    if (mapped === "Shower Doors" && isTubDoor(p)) return "Tub Doors";
-    return mapped;
-  }
+  if (p.productType && typeMap[p.productType]) return typeMap[p.productType];
   if (p.productType) return p.productType;
 
-  // 3. Infer from name as last resort
+  // Infer from name
   const name = p.name.toLowerCase();
-  if (/tub\s*(door|enclosure)/i.test(name))                     return "Tub Doors";
-  if (name.includes("shower base") || name.includes("shower pan")) return "Shower Bases";
-  if (name.includes("shower door"))                               return "Shower Doors";
-  if (/bathtub|soaking\s*tub|\balcove\b.*\btub\b/.test(name))   return "Bathtubs";
-  if (/backwall|wall\s*(panel|system|kit)|\bshower\s*wall/.test(name)) return "Wall";
-  if (/neo.?angle/.test(name) && /enclosure/.test(name))         return "Shower Enclosures";
-  if (name.includes("enclosure"))                                 return "Shower Enclosures";
+  if (/tub\s*(door|enclosure)/.test(name))                     return "Tub Doors";
+  if (/one.?piece\s*shower/.test(name))                        return "Showers";
+  if (/shower\s*(base|pan)/.test(name))                        return "Shower Bases";
+  if (/shower\s*door/.test(name))                              return "Shower Doors";
+  if (/freestanding.*(?:tub|bath)/i.test(name))                return "Bathtubs";
+  if (/drop.?in.*(?:tub|bath)/i.test(name))                   return "Bathtubs";
+  if (/alcove.*(?:tub|bath)/i.test(name))                      return "Bathtubs";
+  if (/bathtub|soaking\s*tub/.test(name))                      return "Bathtubs";
+  if (/(?:tub|bath).*shower/.test(name))                       return "Tub/Shower Combo";
+  if (/backwall|wall\s*(panel|system|kit)|shower\s*wall/.test(name)) return "Wall";
+  if (/neo.?angle/.test(name) && /enclosure/.test(name))       return "Shower Enclosures";
+  if (/enclosure/.test(name))                                  return "Shower Enclosures";
   if (/shower\s*head|faucet|showerhead|rain.*shower/.test(name)) return "Fixtures";
-  if (/pedestal.*sink|vanity|sink/.test(name))                   return "Sinks";
-  if (/one.?piece\s*shower/.test(name))                          return "Showers";
+  if (/pedestal.*sink|vanity|\bsink\b/.test(name))             return "Sinks";
 
   return "Other";
 }
 
-/** Detect tub doors by name — the category field doesn't distinguish them */
-function isTubDoor(p: Product): boolean {
-  return /tub\s*(door|enclosure)/i.test(p.name || "");
-}
-
 // ---------------------------------------------------------------------------
-// Installation Geometry
+// Compatible Types — Physical Installation Rules
 // ---------------------------------------------------------------------------
-
-type Geometry = "neo-angle" | "corner" | "alcove" | "freestanding" | "standard";
-
-function getGeometry(p: Product): Geometry {
-  const name = (p.name || "").toLowerCase();
-  const instType = (p.installationType || "").toLowerCase();
-
-  if (/neo.?angle/.test(name) || instType === "corner") return "neo-angle";
-  if (/\bcorner\b/.test(name) && !/neo/.test(name))     return "corner";
-  if (/freestanding/.test(name) || instType === "freestanding") return "freestanding";
-  if (/\balcove\b/.test(name) || instType === "alcove" || instType === "3-wall alcove") return "alcove";
-
-  return "standard"; // Default — no geometry constraint
-}
 
 /**
- * Check if two products have compatible installation geometry.
- * Neo-angle only matches neo-angle. Freestanding only matches freestanding.
- * Everything else is compatible with each other.
+ * Returns the list of product types that are physically compatible
+ * with the given source type. Encodes real-world installation logic.
  */
-function isGeometryCompatible(a: Geometry, b: Geometry): boolean {
-  // Neo-angle is exclusive
-  if (a === "neo-angle" || b === "neo-angle") return a === b;
-  // Freestanding is exclusive
-  if (a === "freestanding" || b === "freestanding") return a === b;
-  // Everything else is compatible
-  return true;
+function getCompatibleTypes(sourceType: string, source: Product): string[] {
+  // ---- Kit products: only suggest what they DON'T already include ----
+  if (KIT_TYPES.has(sourceType)) {
+    if (sourceType === "Shower Door, Base and Walls") return ["Fixtures"];
+    return ["Wall", "Fixtures"];
+  }
+
+  // ---- Bathtubs: depends on installation sub-type ----
+  if (isBathtub(sourceType)) {
+    const install = getBathtubInstall(source);
+
+    if (install === "alcove" || install === "unknown") {
+      // Alcove tubs get tub doors + wall surrounds + fixtures
+      return ["Tub Doors", "Wall", "Fixtures"];
+    }
+    // Freestanding, drop-in, corner tubs get fixtures only
+    return ["Fixtures"];
+  }
+
+  // ---- Tub/Shower Combos: one-piece units with an open side ----
+  if (sourceType === "Tub/Shower Combo") {
+    return ["Tub Doors", "Fixtures"];
+  }
+
+  // ---- Tub Doors: match to alcove bathtubs only ----
+  if (sourceType === "Tub Doors") {
+    return ["Bathtubs", "Tub/Shower Combo"];
+  }
+
+  // ---- Shower Bases: get doors, enclosures, walls ----
+  if (sourceType === "Shower Bases") {
+    return ["Shower Doors", "Shower Enclosures", "Wall", "Fixtures"];
+  }
+
+  // ---- Shower Doors: match to bases and walls ----
+  if (sourceType === "Shower Doors") {
+    return ["Shower Bases", "Wall", "Fixtures"];
+  }
+
+  // ---- Shower Enclosures: match to bases and walls ----
+  if (sourceType === "Shower Enclosures") {
+    return ["Shower Bases", "Wall", "Fixtures"];
+  }
+
+  // ---- Wall Panels: work with shower bases, doors, AND alcove tubs ----
+  if (sourceType === "Wall") {
+    return ["Shower Bases", "Shower Doors", "Shower Enclosures", "Bathtubs"];
+  }
+
+  // ---- One-Piece Showers: might accept a door + fixtures ----
+  if (sourceType === "Showers") {
+    return ["Shower Doors", "Fixtures"];
+  }
+
+  // ---- Fixtures, Sinks, Other: no outgoing compatibility ----
+  return [];
 }
 
 // ---------------------------------------------------------------------------
@@ -145,26 +202,24 @@ function isGeometryCompatible(a: Geometry, b: Geometry): boolean {
 // ---------------------------------------------------------------------------
 
 interface ParsedDimensions {
-  depth: number;   // Smaller number (front-to-back)
-  width: number;   // Larger number (side-to-side)
+  depth: number;
+  width: number;
 }
 
-/**
- * Parse product dimensions from the dimensions field or product name.
- * Always normalizes so depth <= width for consistent keys.
- */
 function parseDimensions(product: Product): ParsedDimensions | null {
-  // Try structured dimensions field first (only if both are populated)
+  // Try structured dimensions field first
   const dw = product.dimensions;
   if (dw) {
-    const w = parseFloat(String(dw.width));
-    const d = parseFloat(String(dw.depth));
+    const w = parseFloat(dw.width);
+    const d = parseFloat(dw.depth);
     if (w > 0 && d > 0) {
       return { depth: Math.min(d, w), width: Math.max(d, w) };
     }
   }
 
-  // Parse from product name
+  // Tub doors use range dimensions ("56-59 in.") — don't parse these as depth×width
+  if (isTubDoor(product)) return null;
+
   const name = product.name || "";
 
   // Pattern 1: "NN in. D x NN in. W" (DreamLine style)
@@ -178,7 +233,6 @@ function parseDimensions(product: Product): ParsedDimensions | null {
   const nxn = name.match(/(\d+)\s*(?:in\.?|inch|")?\s*[xX×]\s*(\d+)/);
   if (nxn) {
     const a = parseInt(nxn[1]), b = parseInt(nxn[2]);
-    // Filter out small numbers that are likely model numbers, not dimensions
     if (a >= 20 && b >= 20 && a <= 84 && b <= 84) {
       return { depth: Math.min(a, b), width: Math.max(a, b) };
     }
@@ -187,40 +241,8 @@ function parseDimensions(product: Product): ParsedDimensions | null {
   return null;
 }
 
-/** Create a string key from parsed dimensions */
 function dimKey(dims: ParsedDimensions): string {
   return `${dims.depth}x${dims.width}`;
-}
-
-// ---------------------------------------------------------------------------
-// Drain Position
-// ---------------------------------------------------------------------------
-
-type DrainPosition = "left" | "right" | "center" | "corner" | "end" | "rear-center" | "unknown";
-
-function getDrainPosition(p: Product): DrainPosition | null {
-  // Check specs first
-  const dp = p.specifications?.["drain position"];
-  if (dp) {
-    const v = dp.toLowerCase().trim();
-    if (v.includes("left"))         return "left";
-    if (v.includes("right"))        return "right";
-    if (v.includes("rear center"))  return "rear-center";
-    if (v.includes("front center")) return "center";
-    if (v === "center")             return "center";
-    if (v.includes("corner"))       return "corner";
-    if (v.includes("end"))          return "end";
-    return "unknown";
-  }
-
-  // Parse from name
-  const name = (p.name || "").toLowerCase();
-  if (/\bleft\s*drain/.test(name))   return "left";
-  if (/\bright\s*drain/.test(name))  return "right";
-  if (/\bcenter\s*drain/.test(name)) return "center";
-  if (/\bcorner\s*drain/.test(name)) return "corner";
-
-  return null; // No drain info — not a constraint
 }
 
 // ---------------------------------------------------------------------------
@@ -256,20 +278,6 @@ function getCollectionIndex(): Map<string, Product[]> {
 }
 
 // ---------------------------------------------------------------------------
-// Compatible Types
-// ---------------------------------------------------------------------------
-
-function getCompatibleTypes(type: string): string[] {
-  if (KIT_TYPES.has(type)) {
-    // Kits already include door+base; only suggest what's missing
-    if (type === "Shower Door, Base and Walls") return ["Fixtures"];
-    if (type === "Shower Enclosure and Base")   return ["Wall", "Fixtures"];
-    return ["Wall", "Fixtures"];
-  }
-  return CROSS_CATEGORY_RULES[type] || [];
-}
-
-// ---------------------------------------------------------------------------
 // Scoring
 // ---------------------------------------------------------------------------
 
@@ -283,29 +291,35 @@ function scoreMatch(
   fuzzy: boolean,
   seriesMatch: boolean,
 ): ScoredProduct | null {
-  // Hard filter: skip self
   if (candidate.id === source.id) return null;
+  if (candidateType === sourceType && !isBathtub(sourceType)) return null;
 
-  // Hard filter: must be a different type (we want cross-category)
-  if (candidateType === sourceType) return null;
-
-  // Hard filter: candidate type must be in the allowed list
-  const compatTypes = getCompatibleTypes(sourceType);
+  // Must be in the allowed compatibility list
+  const compatTypes = getCompatibleTypes(sourceType, source);
   if (!compatTypes.includes(candidateType)) return null;
 
-  // Hard filter: geometry must be compatible (neo-angle ↔ neo-angle only)
+  // Geometry constraint: neo-angle only matches neo-angle
   const candidateGeometry = getGeometry(candidate);
   if (!isGeometryCompatible(sourceGeometry, candidateGeometry)) return null;
 
-  // Hard filter: compartment-type safety
-  // Shower doors must not appear for bathtubs (only tub doors can)
-  // Bathtubs must not appear for shower doors (only shower bases can)
-  if (sourceType === "Bathtubs" && candidateType === "Shower Doors") return null;
-  if (sourceType === "Shower Doors" && candidateType === "Bathtubs") return null;
-  if (sourceType === "Shower Bases" && candidateType === "Tub Doors") return null;
-  if (sourceType === "Tub Doors" && candidateType === "Shower Bases") return null;
+  // Bathtub sub-type constraint for tub doors:
+  // Tub doors only work with ALCOVE bathtubs (not freestanding/drop-in)
+  if (candidateType === "Tub Doors" && isBathtub(sourceType)) {
+    const install = getBathtubInstall(source);
+    if (install !== "alcove" && install !== "unknown") return null;
+  }
+  if (sourceType === "Tub Doors" && isBathtub(candidateType)) {
+    const install = getBathtubInstall(candidate);
+    if (install !== "alcove" && install !== "unknown") return null;
+  }
 
-  // Score assignment
+  // Wall panels for bathtubs: only alcove tubs get wall panels
+  if (candidateType === "Wall" && isBathtub(sourceType)) {
+    const install = getBathtubInstall(source);
+    if (install !== "alcove" && install !== "unknown") return null;
+  }
+
+  // Scoring
   let score = 0;
   let matchType = "";
 
@@ -322,22 +336,79 @@ function scoreMatch(
     score = 65;
     matchType = "series";
   } else {
-    return null; // No matching signal at all
+    return null;
   }
 
-  // Apply modifiers
   if (fuzzy) {
     score -= 10;
     matchType = "fuzzy-" + matchType;
   }
   if (candidate.brand === source.brand) score = Math.min(100, score + 5);
-
-  // Neo-angle same-dim same-geo bonus (these are strong matches)
   if (sourceGeometry === "neo-angle" && candidateGeometry === "neo-angle" && dimMatch) {
     score = Math.min(100, score + 5);
   }
 
   return { product: candidate, score, matchType };
+}
+
+// ---------------------------------------------------------------------------
+// Tub Door ↔ Alcove Bathtub Matching
+// ---------------------------------------------------------------------------
+
+/**
+ * All tub doors in the catalog fit standard 60-inch alcove tubs.
+ * This function handles the special matching since tub doors don't
+ * have standard depth×width dimensions.
+ */
+function matchTubDoorsAndTubs(
+  source: Product,
+  sourceType: string,
+  seen: Set<string>,
+  addMatch: (sp: ScoredProduct) => void,
+) {
+  const allProducts = getCatalogProducts();
+
+  if (sourceType === "Tub Doors") {
+    // Source is a tub door → find alcove bathtubs with ~60in width
+    for (const candidate of allProducts) {
+      if (seen.has(candidate.id)) continue;
+      const candType = getNormalizedType(candidate);
+      if (!isBathtub(candType)) continue;
+      const install = getBathtubInstall(candidate);
+      if (install !== "alcove" && install !== "unknown") continue;
+
+      // Check width is ~60 inches
+      const dims = parseDimensions(candidate);
+      if (dims && (dims.width < 55 || dims.width > 62)) continue;
+
+      const sameBrand = candidate.brand === source.brand;
+      addMatch({
+        product: candidate,
+        score: sameBrand ? 80 : 70,
+        matchType: sameBrand ? "tub-door+brand" : "tub-door",
+      });
+    }
+  } else if (isBathtub(sourceType)) {
+    // Source is an alcove bathtub → find tub doors
+    const install = getBathtubInstall(source);
+    if (install !== "alcove" && install !== "unknown") return;
+
+    const sourceDims = parseDimensions(source);
+    // Only match if bathtub is standard width (~60in)
+    if (sourceDims && (sourceDims.width < 55 || sourceDims.width > 62)) return;
+
+    for (const candidate of allProducts) {
+      if (seen.has(candidate.id)) continue;
+      if (!isTubDoor(candidate)) continue;
+
+      const sameBrand = candidate.brand === source.brand;
+      addMatch({
+        product: candidate,
+        score: sameBrand ? 80 : 70,
+        matchType: sameBrand ? "tub-door+brand" : "tub-door",
+      });
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -350,8 +421,8 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
   const sourceGeometry = getGeometry(product);
   const sourceCollection = product.collection?.toLowerCase().trim() || "";
 
-  // Don't try to match "Other", "Sinks", or truly unclassifiable products
-  if (sourceType === "Other" || sourceType === "Sinks") return [];
+  // Don't try to match unmatchable types
+  if (["Other", "Sinks", "Fixtures", "Shower System"].includes(sourceType)) return [];
 
   const dimIndex = getDimensionIndex();
   const colIndex = getCollectionIndex();
@@ -383,8 +454,7 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
       if (sp) addMatch(sp);
     }
 
-    // ---- Layer 2: Fuzzy dimension matching (±2 inches) ----
-    // Only on the depth dimension (front-to-back tolerance), width must be exact
+    // ---- Layer 2: Fuzzy dimension matching (±2 on depth only, width must be exact) ----
     for (let delta = -2; delta <= 2; delta++) {
       if (delta === 0) continue;
       const fuzzyKey = `${sourceDims.depth + delta}x${sourceDims.width}`;
@@ -402,8 +472,10 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
     }
   }
 
-  // ---- Layer 3: Collection/series matching ----
-  // Catches products that share a design series but may not parse dimensions
+  // ---- Layer 3: Tub door ↔ alcove bathtub matching (special) ----
+  matchTubDoorsAndTubs(product, sourceType, seen, addMatch);
+
+  // ---- Layer 4: Collection/series matching ----
   if (sourceCollection) {
     const colMatches = colIndex.get(sourceCollection) || [];
     for (const candidate of colMatches) {
@@ -416,18 +488,17 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
     }
   }
 
-  // ---- Layer 4: Fixtures as universal add-ons ----
-  // If the source is a main shower/tub component, show fixtures
-  const showFixtures = ["Shower Bases", "Shower Doors", "Shower Enclosures",
-    "Bathtubs", "Showers"].includes(sourceType)
-    || KIT_TYPES.has(sourceType);
+  // ---- Layer 5: Fixtures as universal add-ons ----
+  const showFixtures = [
+    "Shower Bases", "Shower Doors", "Shower Enclosures",
+    "Bathtubs", "Showers", "Tub/Shower Combo",
+  ].includes(sourceType) || KIT_TYPES.has(sourceType);
 
   if (showFixtures) {
     for (const candidate of getCatalogProducts()) {
       const candidateType = getNormalizedType(candidate);
       if (candidateType !== "Fixtures") continue;
       if (seen.has(candidate.id)) continue;
-      // Fixtures are universal — same brand preferred, but all shown
       const sameBrand = candidate.brand === product.brand;
       addMatch({
         product: candidate,
@@ -440,7 +511,6 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
   // ---- Build result groups ----
   const result: CompatibleGroup[] = [];
   groupMap.forEach((scored, category) => {
-    // Sort within group by score descending
     scored.sort((a, b) => b.score - a.score);
     result.push({
       category,
@@ -449,7 +519,7 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
     });
   });
 
-  // Sort groups: highest-scored group first, then by count
+  // Sort groups: highest-scored first, then by count
   result.sort((a, b) => {
     const aTop = a.products[0]?.score ?? 0;
     const bTop = b.products[0]?.score ?? 0;
@@ -464,4 +534,5 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
 // Exports
 // ---------------------------------------------------------------------------
 
-export { parseDimensions, getNormalizedType, getGeometry, getDrainPosition, MAX_PER_GROUP };
+export { parseDimensions, getNormalizedType, getGeometry, getBathtubInstall, MAX_PER_GROUP };
+export type { ParsedDimensions, Geometry, BathtubInstall };
