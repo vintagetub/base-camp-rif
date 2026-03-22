@@ -161,7 +161,7 @@ export function CatalogContent() {
           )}
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between mb-5 gap-4 bg-white rounded-xl px-4 py-3 shadow-card border border-border-subtle">
+          <div className="flex items-center justify-between mb-5 gap-4 bg-surface rounded-lg px-4 py-3 shadow-sm border border-border-subtle">
             <p className="text-sm text-text-secondary">
               Showing{" "}
               <span className="font-semibold text-text-primary">
@@ -199,7 +199,7 @@ export function CatalogContent() {
                     "p-2 transition-colors",
                     view === "grid"
                       ? "bg-navy text-white"
-                      : "bg-white text-text-tertiary hover:bg-surface-sunken"
+                      : "bg-surface text-text-tertiary hover:bg-surface-sunken"
                   )}
                 >
                   <LayoutGrid className="w-4 h-4" />
@@ -210,7 +210,7 @@ export function CatalogContent() {
                     "p-2 transition-colors",
                     view === "list"
                       ? "bg-navy text-white"
-                      : "bg-white text-text-tertiary hover:bg-surface-sunken"
+                      : "bg-surface text-text-tertiary hover:bg-surface-sunken"
                   )}
                 >
                   <List className="w-4 h-4" />
@@ -225,7 +225,7 @@ export function CatalogContent() {
               <div
                 className={cn(
                   view === "grid"
-                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5"
+                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5"
                     : "flex flex-col gap-3"
                 )}
               >
@@ -281,7 +281,7 @@ export function CatalogContent() {
               )}
             </>
           ) : (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-card border border-border-subtle">
+            <div className="text-center py-20 bg-surface rounded-xl shadow-sm border border-border-subtle">
               <Search className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
               <p className="text-text-primary text-lg font-semibold mb-2">
                 No products found

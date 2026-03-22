@@ -43,13 +43,13 @@ function CheckboxFilter({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="w-4 h-4 rounded border-gray-300 text-navy focus:ring-navy cursor-pointer"
+        className="w-4 h-4 rounded border-border-default text-navy focus:ring-navy cursor-pointer"
       />
-      <span className="text-sm text-gray-700 group-hover:text-navy transition-colors flex-1">
+      <span className="text-sm text-text-secondary group-hover:text-navy transition-colors flex-1">
         {label}
       </span>
       {count !== undefined && (
-        <span className="text-xs text-gray-400 tabular-nums">({count})</span>
+        <span className="text-xs text-text-tertiary tabular-nums">({count})</span>
       )}
     </label>
   );
@@ -73,7 +73,7 @@ function ToggleFilter({
         "w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
         checked
           ? "bg-navy/10 border-navy/30 text-navy"
-          : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+          : "bg-surface border-border-subtle text-text-secondary hover:border-border-default hover:bg-surface-sunken"
       )}
     >
       <Icon className="w-4 h-4 shrink-0" />
@@ -81,7 +81,7 @@ function ToggleFilter({
       <div
         className={cn(
           "w-8 h-5 rounded-full transition-colors relative",
-          checked ? "bg-navy" : "bg-gray-300"
+          checked ? "bg-navy" : "bg-border-default"
         )}
       >
         <div
@@ -107,13 +107,13 @@ function AccordionSection({
   children: React.ReactNode;
 }) {
   return (
-    <Accordion.Item value={value} className="border-b border-gray-200">
+    <Accordion.Item value={value} className="border-b border-border-subtle">
       <Accordion.Header>
-        <Accordion.Trigger className="flex items-center justify-between w-full py-3 text-sm font-semibold text-gray-800 hover:text-navy transition-colors group">
+        <Accordion.Trigger className="flex items-center justify-between w-full py-3 text-sm font-semibold text-text-primary hover:text-navy transition-colors group">
           <span className="flex items-center gap-2">
             {title}
             {activeCount !== undefined && activeCount > 0 && (
-              <span className="bg-navy text-white rounded-full px-1.5 py-0.5 text-[10px] leading-none font-bold">
+              <span className="bg-navy text-white rounded-full px-1.5 py-0.5 text-xs leading-none font-bold">
                 {activeCount}
               </span>
             )}
@@ -186,8 +186,8 @@ export function FilterSidebar({
   const filterContent = (
     <>
       {activeFilterCount > 0 && (
-        <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-          <span className="text-sm text-gray-600">
+        <div className="flex items-center justify-between pb-3 border-b border-border-subtle">
+          <span className="text-sm text-text-secondary">
             {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
           </span>
           <button
@@ -331,8 +331,8 @@ export function FilterSidebar({
       </Accordion.Root>
 
       {/* Toggle filters */}
-      <div className="py-3 border-b border-gray-200 space-y-2">
-        <p className="text-sm font-semibold text-gray-800 mb-2">Quick Filters</p>
+      <div className="py-3 border-b border-border-subtle space-y-2">
+        <p className="text-sm font-semibold text-text-primary mb-2">Quick Filters</p>
         <ToggleFilter
           label="ADA Compliant"
           icon={Accessibility}
@@ -379,7 +379,7 @@ export function FilterSidebar({
             className="fixed inset-0 bg-black/40 z-40 lg:hidden"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="fixed inset-y-0 left-0 w-80 bg-white z-50 shadow-2xl lg:hidden overflow-y-auto">
+          <div className="fixed inset-y-0 left-0 w-80 bg-surface z-50 shadow-2xl lg:hidden overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="font-semibold text-lg">Filters</h2>
               <button onClick={() => setMobileOpen(false)}>
@@ -404,11 +404,11 @@ export function FilterSidebar({
       <aside className="hidden lg:block w-64 shrink-0">
         <div className="sticky top-20 space-y-1">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-gray-800 flex items-center gap-2">
+            <h2 className="font-semibold text-text-primary flex items-center gap-2">
               <SlidersHorizontal className="w-4 h-4" />
               Filters
             </h2>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-text-tertiary">
               {totalResults} products
             </span>
           </div>

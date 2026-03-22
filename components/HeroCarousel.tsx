@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, FormEvent } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { useRouter } from "next/navigation";
-import { Search, ChevronLeft, ChevronRight, Zap } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { CHANNEL } from "@/lib/channel";
 import { cn } from "@/lib/utils";
 
@@ -69,29 +69,28 @@ export function HeroCarousel() {
       <div className="absolute inset-0 flex items-center pointer-events-none">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
           <div className="max-w-2xl pointer-events-auto">
-            <div className="inline-flex items-center gap-2 bg-amber/20 text-amber-light rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <Zap className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 bg-white/10 text-amber-light rounded-full px-4 py-1.5 text-sm font-medium mb-6 backdrop-blur-sm">
               {CHANNEL.id !== "all" ? `${CHANNEL.name} Pro Sales` : "Pro Sales Portal"}
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-4 text-white">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-4 text-white">
               The Pro Sales
               <br />
               <span className="text-amber">Product Catalog</span>
             </h1>
-            <p className="text-base md:text-lg text-white/70 mb-8 max-w-xl">
+            <p className="text-sm sm:text-base md:text-lg text-white/80 mb-8 max-w-xl">
               Search. Quote. Close. {CHANNEL.tagline}
             </p>
 
-            <form onSubmit={handleHeroSearch} className="max-w-xl relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber/40 via-amber/20 to-amber/40 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center bg-white rounded-xl shadow-2xl overflow-hidden">
-                <Search className="w-5 h-5 text-gray-400 ml-5 shrink-0" />
+            <form onSubmit={handleHeroSearch} className="max-w-xl">
+              <div className="flex items-center bg-surface rounded-lg shadow-2xl overflow-hidden">
+                <Search className="w-5 h-5 text-text-tertiary ml-5 shrink-0" />
                 <input
                   type="text"
                   value={heroSearch}
                   onChange={(e) => setHeroSearch(e.target.value)}
                   placeholder="Search products, SKUs, brands..."
-                  className="flex-1 px-4 py-4 md:py-5 text-gray-900 placeholder:text-gray-400 text-base md:text-lg bg-transparent focus:outline-none"
+                  aria-label="Search products"
+                  className="flex-1 px-4 py-4 md:py-5 text-text-primary placeholder:text-text-tertiary text-base md:text-lg bg-transparent focus:outline-none"
                 />
                 <button
                   type="submit"

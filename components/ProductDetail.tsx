@@ -335,7 +335,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
   // -- render ---------------------------------------------------------------
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 lg:pb-8">
       {/* ===================== Breadcrumb ===================== */}
       <nav className="flex items-center gap-2 text-sm text-gray-500 mb-6">
         <Link href="/" className="hover:text-navy transition-colors">
@@ -364,8 +364,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
       {/* ===================== Hero Section ===================== */}
       <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* Left: Gallery + video embed */}
-        <div className="space-y-6">
+        {/* Left: Gallery + video embed — sticky on desktop */}
+        <div className="space-y-6 lg:sticky lg:top-20 lg:self-start">
           <ImageGallery
             images={product.images}
             brand={product.brand}
@@ -1034,6 +1034,20 @@ export function ProductDetail({ product }: ProductDetailProps) {
             </div>
           </section>
         )}
+      </div>
+
+      {/* Mobile sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-surface border-t border-border-subtle p-3 shadow-lg lg:hidden z-40">
+        <div className="flex items-center gap-3 max-w-7xl mx-auto">
+          <div className="flex-1 min-w-0">
+            {hasPrice && <p className="font-bold text-navy">{formatPrice(price)}</p>}
+            <p className="text-xs text-text-secondary truncate">{product.shortName || product.name}</p>
+          </div>
+          <Button variant="amber" onClick={handleAddToQuote}>
+            <ShoppingCart className="w-4 h-4" />
+            Add to Quote
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -208,7 +208,7 @@ export function Navbar() {
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
-                <span className="hidden md:inline text-sm text-white/60">
+                <span className="hidden md:inline text-sm text-white/80">
                   Search
                 </span>
                 <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-xs font-mono">
@@ -227,7 +227,7 @@ export function Navbar() {
               >
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-amber text-navy text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse-soft">
+                  <span className="absolute -top-1 -right-1 bg-amber text-navy text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 )}
@@ -286,10 +286,10 @@ export function Navbar() {
 
           {/* Search panel */}
           <div className="relative max-w-2xl mx-auto mt-[15vh] px-4">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
+            <div className="bg-surface rounded-xl shadow-2xl overflow-hidden animate-fade-in-up">
               {/* Search input */}
-              <div className="flex items-center gap-3 px-5 border-b border-gray-200">
-                <Search className="w-5 h-5 text-gray-400 shrink-0" />
+              <div className="flex items-center gap-3 px-5 border-b border-border-subtle">
+                <Search className="w-5 h-5 text-text-tertiary shrink-0" />
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -300,7 +300,7 @@ export function Navbar() {
                   }}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search products, SKUs, brands..."
-                  className="flex-1 py-4 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+                  className="flex-1 py-4 text-base text-text-primary placeholder:text-text-tertiary bg-transparent focus:outline-none"
                 />
                 {query && (
                   <button
@@ -308,12 +308,12 @@ export function Navbar() {
                       setQuery("");
                       setResults([]);
                     }}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-text-tertiary hover:text-text-secondary"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 )}
-                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded bg-gray-100 text-gray-400 text-xs font-mono">
+                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded bg-surface-sunken text-text-tertiary text-xs font-mono">
                   ESC
                 </kbd>
               </div>
@@ -326,11 +326,11 @@ export function Navbar() {
                       key={product.id}
                       onClick={() => navigateToProduct(product)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0",
-                        selectedIndex === i && "bg-gray-50"
+                        "w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-surface-sunken transition-colors border-b border-border-subtle last:border-0",
+                        selectedIndex === i && "bg-surface-sunken"
                       )}
                     >
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                      <div className="w-12 h-12 bg-surface-sunken rounded-lg overflow-hidden shrink-0">
                         {product.images[0] ? (
                           <Image
                             src={product.images[0]}
@@ -341,16 +341,16 @@ export function Navbar() {
                             unoptimized
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-medium">
+                          <div className="w-full h-full flex items-center justify-center text-text-tertiary text-xs font-medium">
                             {product.brand[0]}
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-text-primary truncate">
                           {product.shortName || product.name}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-text-secondary truncate">
                           {product.brand} &middot; SKU: {product.sku}
                           {product.isParent && product.childVariantIds && product.childVariantIds.length > 0 && (
                             <span className="ml-1 text-navy font-medium">
@@ -382,7 +382,7 @@ export function Navbar() {
 
               {query && results.length === 0 && (
                 <div className="px-5 py-8 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-text-secondary">
                     No products found for &ldquo;{query}&rdquo;
                   </p>
                   <button
@@ -399,24 +399,24 @@ export function Navbar() {
 
               {!query && (
                 <div className="px-5 py-6 text-center">
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-text-tertiary">
                     Type to search products, SKUs, or brands
                   </p>
-                  <div className="flex items-center justify-center gap-4 mt-3 text-xs text-gray-400">
+                  <div className="flex items-center justify-center gap-4 mt-3 text-xs text-text-tertiary">
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded bg-surface-sunken font-mono">
                         &uarr;&darr;
                       </kbd>
                       Navigate
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded bg-surface-sunken font-mono">
                         Enter
                       </kbd>
                       Select
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded bg-surface-sunken font-mono">
                         Esc
                       </kbd>
                       Close

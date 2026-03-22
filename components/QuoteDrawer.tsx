@@ -80,12 +80,12 @@ export function QuoteDrawer() {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-drawer z-50 flex flex-col transition-transform duration-300 ease-out font-[var(--font-jakarta)]",
+          "fixed top-0 right-0 h-full w-full max-w-md bg-surface shadow-drawer z-50 flex flex-col transition-transform duration-300 ease-out",
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-surface-sunken">
           <div className="flex items-center gap-2">
             <ShoppingCart className="w-5 h-5 text-navy" />
             <h2 className="font-semibold text-navy text-lg">Quote Cart</h2>
@@ -97,9 +97,9 @@ export function QuoteDrawer() {
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-lg hover:bg-surface-sunken transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-text-secondary" />
           </button>
         </div>
 
@@ -107,13 +107,13 @@ export function QuoteDrawer() {
         <div className="flex-1 overflow-y-auto p-4">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-6">
-              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <ShoppingCart className="w-12 h-12 text-gray-200" />
+              <div className="w-24 h-24 bg-surface-sunken rounded-full flex items-center justify-center mb-4">
+                <ShoppingCart className="w-12 h-12 text-border-default" />
               </div>
-              <h3 className="font-semibold text-gray-700 mb-1 text-lg">
+              <h3 className="font-semibold text-text-primary mb-1 text-lg">
                 Your quote cart is empty
               </h3>
-              <p className="text-sm text-gray-400 mb-6 max-w-[240px]">
+              <p className="text-sm text-text-tertiary mb-6 max-w-[240px]">
                 Browse our catalog and add products to start building your
                 custom quote
               </p>
@@ -131,7 +131,7 @@ export function QuoteDrawer() {
                 return (
                   <div key={brand}>
                     {/* Brand header */}
-                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border-subtle">
                       {brandInfo.logo ? (
                         <Image
                           src={brandInfo.logo}
@@ -149,10 +149,10 @@ export function QuoteDrawer() {
                           {brand[0]}
                         </div>
                       )}
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
                         {brand}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-text-tertiary">
                         ({brandItems.length})
                       </span>
                     </div>
@@ -162,9 +162,9 @@ export function QuoteDrawer() {
                       {brandItems.map((item) => (
                         <div
                           key={item.id}
-                          className="flex gap-3 p-3 bg-gray-50 rounded-xl"
+                          className="flex gap-3 p-3 bg-surface-sunken rounded-lg"
                         >
-                          <div className="w-14 h-14 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                          <div className="w-14 h-14 bg-surface rounded-lg overflow-hidden flex-shrink-0 border border-border-subtle">
                             {item.image ? (
                               <Image
                                 src={item.image}
@@ -187,14 +187,14 @@ export function QuoteDrawer() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate leading-snug">
+                            <p className="text-sm font-medium text-text-primary truncate leading-snug">
                               {item.name}
                             </p>
-                            <p className="text-xs text-gray-400 font-mono mt-0.5">
+                            <p className="text-xs text-text-tertiary font-mono mt-0.5">
                               {item.sku}
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <div className="flex items-center border border-gray-300 rounded-lg bg-white">
+                              <div className="flex items-center border border-border-default rounded-lg bg-surface">
                                 <button
                                   onClick={() =>
                                     updateQuantity(
@@ -202,7 +202,7 @@ export function QuoteDrawer() {
                                       item.quantity - 1
                                     )
                                   }
-                                  className="p-1 hover:bg-gray-100 rounded-l-lg transition-colors"
+                                  className="p-1 hover:bg-surface-sunken rounded-l-lg transition-colors"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
@@ -216,14 +216,14 @@ export function QuoteDrawer() {
                                       item.quantity + 1
                                     )
                                   }
-                                  className="p-1 hover:bg-gray-100 rounded-r-lg transition-colors"
+                                  className="p-1 hover:bg-surface-sunken rounded-r-lg transition-colors"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
                               </div>
                               <button
                                 onClick={() => removeItem(item.id)}
-                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                className="p-1 text-text-tertiary hover:text-red-500 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -238,7 +238,7 @@ export function QuoteDrawer() {
                                   )}
                                 </p>
                                 {item.quantity > 1 && (
-                                  <p className="text-xs text-gray-400">
+                                  <p className="text-xs text-text-tertiary">
                                     {formatPrice(item.price)} ea
                                   </p>
                                 )}
@@ -261,15 +261,15 @@ export function QuoteDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-gray-200 p-4 bg-gray-50 space-y-3">
+          <div className="border-t border-border-subtle p-4 bg-surface-sunken space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Estimated Subtotal</span>
+              <span className="text-sm text-text-secondary">Estimated Subtotal</span>
               <span className="text-xl font-bold text-navy">
                 {formatPrice(subtotal)}
               </span>
             </div>
             {subtotal === 0 && items.length > 0 && (
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-text-tertiary">
                 Some items require a quote for pricing
               </p>
             )}

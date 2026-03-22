@@ -29,8 +29,8 @@ const ABG_BRANDS = [
 
 export function Footer() {
   return (
-    <footer className="bg-[#414042] text-white/70 pt-16 pb-8 mt-20">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+    <footer className="bg-navy-950 text-white/70 border-t-4 border-amber mt-20">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pt-12 md:pt-16 pb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Column 1: Contact */}
           <div>
@@ -126,7 +126,7 @@ export function Footer() {
           </div>
 
           {/* Column 4: Made in USA/Canada */}
-          <div className="flex flex-col items-center lg:items-start">
+          <div className="flex flex-col items-start">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="https://res.cloudinary.com/american-bath-group/image/upload/v1695411973/abg-graphics/icons/abg/made-in-icons/png/made-in-usa-canada-white.png"
@@ -134,7 +134,7 @@ export function Footer() {
               className="w-32 h-auto opacity-80"
             />
             {CHANNEL.id !== "all" && (
-              <p className="text-xs text-white/40 mt-4 text-center lg:text-left">
+              <p className="text-xs text-white/40 mt-4">
                 {CHANNEL.portalName}
               </p>
             )}
