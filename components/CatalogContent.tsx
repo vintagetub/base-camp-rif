@@ -92,10 +92,10 @@ export function CatalogContent() {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:py-8 overflow-hidden">
       {/* Page header */}
-      <div className="mb-8">
-        <h1 className="text-display-lg text-text-primary">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-display-lg text-text-primary">
           Product Catalog
         </h1>
         {filters.search && (
@@ -111,7 +111,7 @@ export function CatalogContent() {
         )}
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex gap-6 lg:gap-8">
         <FilterSidebar
           brands={brands}
           categories={categories}
@@ -159,7 +159,7 @@ export function CatalogContent() {
           )}
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between mb-6 gap-4 bg-white rounded-xl px-4 py-3 shadow-card border border-border-subtle">
+          <div className="flex items-center justify-between mb-6 gap-3 bg-white rounded-xl px-3 sm:px-4 py-3 shadow-card border border-border-subtle">
             <p className="text-sm text-text-secondary">
               <span className="font-semibold text-text-primary">
                 {allResults.length > 0 ? startIndex + 1 : 0}&ndash;{Math.min(startIndex + PAGE_SIZE, allResults.length)}
@@ -222,7 +222,7 @@ export function CatalogContent() {
               <div
                 className={cn(
                   view === "grid"
-                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 stagger-children"
+                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 stagger-children"
                     : "flex flex-col gap-3 stagger-children"
                 )}
               >

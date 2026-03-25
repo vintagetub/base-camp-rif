@@ -153,18 +153,18 @@ export function Navbar() {
           <div
             className={cn(
               "flex items-center justify-between transition-all duration-500",
-              scrolled ? "h-14" : "h-[72px]"
+              scrolled ? "h-14" : "h-16 md:h-[72px]"
             )}
           >
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 shrink-0">
+            <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://res.cloudinary.com/american-bath-group/image/upload/v1648488050/abg-graphics/logos/abg/abg-logos/svg/abg-logo-horizontal.svg"
                 alt="American Bath Group"
                 className={cn(
-                  "transition-all duration-500",
-                  scrolled ? "h-6" : "h-8",
+                  "transition-all duration-500 max-w-[180px] sm:max-w-none",
+                  scrolled ? "h-5 sm:h-6" : "h-6 sm:h-8",
                   scrolled ? "" : "brightness-0 invert"
                 )}
               />

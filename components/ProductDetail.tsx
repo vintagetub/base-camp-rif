@@ -692,7 +692,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
       </div>
 
       {/* ===================== Tab Content ===================== */}
-      <div className="mt-10 space-y-20">
+      <div className="mt-6 md:mt-10 space-y-10 md:space-y-20">
         {/* -------- Overview Tab -------- */}
         <section
           ref={(el) => { sectionRefs.current.overview = el; }}

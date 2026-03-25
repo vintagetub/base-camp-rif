@@ -67,7 +67,7 @@ export function HomeContent() {
       {/* ============================================================ */}
       <section className="bg-white border-b border-gray-100 relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5">
-          <div className="flex items-center justify-center gap-8 md:gap-12 flex-wrap">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 md:gap-12 flex-wrap">
             {BRAND_NAMES.map((name) => {
               const brand = BRANDS[name];
               if (!brand || !brand.logo) return null;
@@ -96,11 +96,11 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  SHOP BY CATEGORY — Bento grid with varied sizes             */}
       {/* ============================================================ */}
-      <section className="py-20 bg-surface-sunken relative">
+      <section className="py-10 md:py-20 bg-surface-sunken relative">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="mb-12">
+          <div className="mb-8 md:mb-12">
             <p className="text-label mb-3" style={{ color: accentColor }}>Browse catalog</p>
-            <h2 className="text-display-lg text-gray-900">
+            <h2 className="text-2xl md:text-display-lg text-gray-900">
               Shop by Category
             </h2>
           </div>
@@ -123,7 +123,7 @@ export function HomeContent() {
                     spanClass
                   )}
                 >
-                  <div className={`bg-gradient-to-br ${gradient} p-6 md:p-8 flex flex-col ${idx === 0 ? "h-full justify-end" : "items-start"} relative`}>
+                  <div className={`bg-gradient-to-br ${gradient} p-4 sm:p-6 md:p-8 flex flex-col ${idx === 0 ? "h-full justify-end" : "items-start"} relative`}>
                     {/* Decorative geometric accent */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
@@ -155,12 +155,12 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  SHOP BY BRAND — asymmetric grid                             */}
       {/* ============================================================ */}
-      <section className="py-20 bg-white relative">
+      <section className="py-10 md:py-20 bg-white relative">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-8 md:mb-12">
             <div>
               <p className="text-label mb-3" style={{ color: accentColor }}>Our manufacturers</p>
-              <h2 className="text-display-lg text-gray-900">
+              <h2 className="text-2xl md:text-display-lg text-gray-900">
                 Shop by Brand
               </h2>
             </div>
@@ -181,7 +181,7 @@ export function HomeContent() {
                 <Link
                   key={name}
                   href={`/brands/${brand.slug}`}
-                  className="group flex flex-col items-center p-6 rounded-2xl border border-gray-200 hover:border-transparent hover:shadow-elevated transition-all duration-300 bg-white card-accent-top relative"
+                  className="group flex flex-col items-center p-4 sm:p-6 rounded-2xl border border-gray-200 hover:border-transparent hover:shadow-elevated transition-all duration-300 bg-white card-accent-top relative"
                 >
                   {brand.logo ? (
                     <div className="w-16 h-16 mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -221,12 +221,12 @@ export function HomeContent() {
       {/*  FEATURED PRODUCTS                                           */}
       {/* ============================================================ */}
       {featured.length > 0 && (
-        <section className="py-20 bg-surface-sunken relative">
+        <section className="py-10 md:py-20 bg-surface-sunken relative">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-            <div className="flex items-end justify-between mb-10">
+            <div className="flex items-end justify-between mb-8 md:mb-10">
               <div>
                 <p className="text-label mb-3" style={{ color: accentColor }}>Popular items</p>
-                <h2 className="text-display-lg text-gray-900">
+                <h2 className="text-2xl md:text-display-lg text-gray-900">
                   Featured Products
                 </h2>
               </div>
@@ -238,7 +238,7 @@ export function HomeContent() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 stagger-children">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5 stagger-children">
               {featured.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -250,15 +250,15 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  FEATURES ROW — editorial bento layout                      */}
       {/* ============================================================ */}
-      <section className="py-20 bg-white relative overflow-hidden">
+      <section className="py-10 md:py-20 bg-white relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8 md:mb-14">
             <p className="text-label mb-3" style={{ color: accentColor }}>Why ABG Pro</p>
-            <h2 className="text-display-lg text-gray-900">
+            <h2 className="text-2xl md:text-display-lg text-gray-900">
               Built for Sales Pros
             </h2>
           </div>
-          <div className="grid md:grid-cols-3 gap-6 stagger-children">
+          <div className="grid md:grid-cols-3 gap-4 md:gap-6 stagger-children">
             {[
               {
                 icon: Search,
@@ -284,7 +284,7 @@ export function HomeContent() {
             ].map(({ icon: Icon, title, description, accentGradient }) => (
               <div
                 key={title}
-                className="group relative p-8 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-elevated transition-all duration-300 border border-transparent hover:border-gray-200"
+                className="group relative p-5 md:p-8 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-elevated transition-all duration-300 border border-transparent hover:border-gray-200"
               >
                 <div className={`w-12 h-12 bg-gradient-to-br ${accentGradient} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-6 h-6 text-white" />
@@ -300,11 +300,11 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  QUICK RESOURCES                                             */}
       {/* ============================================================ */}
-      <section className="py-20 bg-surface-sunken">
+      <section className="py-10 md:py-20 bg-surface-sunken">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="mb-12">
+          <div className="mb-8 md:mb-12">
             <p className="text-label mb-3" style={{ color: accentColor }}>Documentation</p>
-            <h2 className="text-display-lg text-gray-900">
+            <h2 className="text-2xl md:text-display-lg text-gray-900">
               Pro Resources
             </h2>
           </div>
@@ -384,9 +384,9 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  CTA — dramatic with gradient                                */}
       {/* ============================================================ */}
-      <section className="py-20">
+      <section className="py-10 md:py-20">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="gradient-hero rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden texture-noise">
+          <div className="gradient-hero rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 text-center text-white relative overflow-hidden texture-noise">
             <div className="relative z-10">
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
@@ -394,7 +394,7 @@ export function HomeContent() {
               >
                 <Shield className="w-8 h-8" style={{ color: accentColor }} />
               </div>
-              <h2 className="text-display-lg text-white mb-4">Ready to Build a Quote?</h2>
+              <h2 className="text-2xl md:text-display-lg text-white mb-4">Ready to Build a Quote?</h2>
               <p className="text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
                 Add products to your cart and submit a quote request. Our team
                 responds within one business day.
