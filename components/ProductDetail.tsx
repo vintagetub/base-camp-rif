@@ -424,7 +424,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             )}
           </div>
 
-          <h1 className="text-2xl md:text-3xl font-bold text-navy-800 leading-tight mb-2">
+          <h1 className="text-display-md text-navy-800 mb-2">
             {product.name || product.shortName}
           </h1>
 
@@ -526,14 +526,14 @@ export function ProductDetail({ product }: ProductDetailProps) {
           )}
 
           {/* Pricing */}
-          <div className="bg-gray-50 rounded-xl p-6 mb-6 shadow-card">
+          <div className="bg-gray-50 rounded-2xl p-6 mb-6 shadow-card border border-gray-100">
             {hasPrice ? (
               <div className="space-y-2">
                 {product.pricing.basePrice && (
                   <div className="flex items-center gap-2">
                     <Tag className="w-4 h-4 text-amber-dark" />
                     <span className="text-sm text-gray-600">Your Price:</span>
-                    <span className="text-3xl font-bold text-navy">
+                    <span className="text-3xl font-bold text-navy font-[var(--font-display)]">
                       {formatPrice(product.pricing.basePrice)}
                     </span>
                   </div>

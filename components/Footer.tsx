@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowUp } from "lucide-react";
 import { CHANNEL } from "@/lib/channel";
 
 const ABG_MENU = [
@@ -28,9 +29,33 @@ const ABG_BRANDS = [
 ];
 
 export function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <footer className="bg-[#414042] text-white/70 pt-16 pb-8 mt-20">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
+    <footer className="bg-navy-950 text-white/60 pt-16 pb-8 mt-20 relative overflow-hidden">
+      {/* Decorative top accent */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber/30 to-transparent" />
+
+      {/* Decorative geometric shapes */}
+      <div className="absolute top-0 right-0 w-80 h-80 bg-white/[0.02] rounded-full -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-60 h-60 bg-white/[0.02] rounded-full translate-y-1/3 -translate-x-1/3" />
+
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 relative z-10">
+        {/* Back to top button */}
+        <div className="flex justify-end mb-8">
+          <button
+            onClick={scrollToTop}
+            className="group flex items-center gap-2 text-xs font-medium text-white/40 hover:text-white/80 transition-colors"
+          >
+            Back to top
+            <span className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/40 group-hover:bg-white/5 transition-all">
+              <ArrowUp className="w-3.5 h-3.5" />
+            </span>
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Column 1: Contact */}
           <div>
@@ -38,9 +63,9 @@ export function Footer() {
             <img
               src="https://res.cloudinary.com/american-bath-group/image/upload/v1648488050/abg-graphics/logos/abg/abg-logos/svg/abg-logo-horizontal.svg"
               alt="American Bath Group"
-              className="h-8 brightness-0 invert opacity-80 mb-5"
+              className="h-7 brightness-0 invert opacity-70 mb-6"
             />
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-3 text-sm">
               <li>
                 <a href="tel:8004437269" className="hover:text-white transition-colors">
                   (800) 443-7269
@@ -52,7 +77,7 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <div className="mt-4 flex flex-col gap-2 text-sm">
+            <div className="mt-5 flex flex-col gap-2.5 text-sm">
               <a
                 href="https://www.americanbathgroup.com/privacy-policy/"
                 target="_blank"
@@ -88,7 +113,7 @@ export function Footer() {
 
           {/* Column 2: ABG Menu */}
           <div>
-            <h4 className="text-white font-semibold text-label mb-4">ABG Menu</h4>
+            <h4 className="text-white font-display font-bold text-label mb-5">ABG Menu</h4>
             <ul className="space-y-2.5 text-sm">
               {ABG_MENU.map((item) => (
                 <li key={item.label}>
@@ -108,7 +133,7 @@ export function Footer() {
 
           {/* Column 3: ABG Brands */}
           <div>
-            <h4 className="text-white font-semibold text-label mb-4">ABG Brands</h4>
+            <h4 className="text-white font-display font-bold text-label mb-5">ABG Brands</h4>
             <ul className="space-y-2.5 text-sm">
               {ABG_BRANDS.map((item) => (
                 <li key={item.label}>
@@ -131,10 +156,10 @@ export function Footer() {
             <img
               src="https://res.cloudinary.com/american-bath-group/image/upload/v1695411973/abg-graphics/icons/abg/made-in-icons/png/made-in-usa-canada-white.png"
               alt="Made in USA & Canada"
-              className="w-32 h-auto opacity-80"
+              className="w-28 h-auto opacity-60"
             />
             {CHANNEL.id !== "all" && (
-              <p className="text-xs text-white/40 mt-4 text-center lg:text-left">
+              <p className="text-xs text-white/30 mt-5 text-center lg:text-left">
                 {CHANNEL.portalName}
               </p>
             )}
@@ -142,7 +167,7 @@ export function Footer() {
         </div>
 
         {/* Copyright bar */}
-        <div className="border-t border-white/10 pt-6 text-xs text-center text-white/40">
+        <div className="border-t border-white/10 pt-6 text-[11px] text-center text-white/30">
           &copy; {new Date().getFullYear()} American Bath Group. All rights reserved.
         </div>
       </div>

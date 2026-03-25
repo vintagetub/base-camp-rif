@@ -765,10 +765,10 @@ export function ChatWidget() {
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? "Close chat" : "Open chat assistant"}
         className={cn(
-          "fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-navy/40 focus:ring-offset-2",
+          "fixed bottom-6 right-6 z-50 w-14 h-14 rounded-2xl shadow-elevated flex items-center justify-center transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-navy/40 focus:ring-offset-2",
           isOpen
             ? "bg-gray-700 rotate-0"
-            : "bg-navy animate-pulse-soft"
+            : "gradient-hero"
         )}
       >
         {isOpen ? (
@@ -781,8 +781,8 @@ export function ChatWidget() {
       {/* Chat Panel */}
       <div
         className={cn(
-          "fixed z-50 bg-white flex flex-col transition-all duration-300 origin-bottom-right",
-          "bottom-24 right-6 w-[440px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-chat border border-gray-200",
+          "fixed z-50 bg-white dark:bg-navy-800 flex flex-col transition-all duration-300 origin-bottom-right",
+          "bottom-24 right-6 w-[440px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-chat border border-gray-200 dark:border-navy-700",
           "max-[640px]:inset-0 max-[640px]:bottom-0 max-[640px]:right-0 max-[640px]:w-full max-[640px]:max-w-full max-[640px]:rounded-none max-[640px]:border-0",
           isOpen
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
@@ -791,15 +791,16 @@ export function ChatWidget() {
         style={{ height: "min(650px, calc(100vh - 8rem))" }}
       >
         {/* Header */}
-        <div className="bg-navy text-white rounded-t-2xl max-[640px]:rounded-t-none px-4 py-3 flex items-center gap-3 shrink-0">
-          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center">
+        <div className="gradient-hero text-white rounded-t-2xl max-[640px]:rounded-t-none px-4 py-3.5 flex items-center gap-3 shrink-0 relative overflow-hidden">
+          <div className="absolute inset-0 animate-shimmer" />
+          <div className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center relative z-10">
             <Sparkles className="w-5 h-5 text-amber" />
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-sm leading-tight">
+          <div className="flex-1 min-w-0 relative z-10">
+            <h3 className="font-display font-bold text-sm leading-tight">
               ABG Pro Sales Assistant
             </h3>
-            <p className="text-[11px] text-white/50">
+            <p className="text-[11px] text-white/40">
               Powered by Claude
             </p>
           </div>
@@ -882,7 +883,7 @@ export function ChatWidget() {
         )}
 
         {/* Input Area */}
-        <div className="p-3 border-t border-gray-200 shrink-0">
+        <div className="p-3 border-t border-gray-200 dark:border-navy-700 shrink-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -896,13 +897,13 @@ export function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about products, specs, UPCs, or quotes..."
-              className="flex-1 rounded-xl border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy transition-colors"
+              className="flex-1 rounded-xl border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-700 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy dark:focus:ring-amber/30 dark:focus:border-amber/50 transition-colors dark:text-white dark:placeholder:text-gray-500"
               disabled={isLoading}
             />
             <button
               type="submit"
               disabled={!input.trim() || isLoading}
-              className="bg-navy text-white rounded-xl p-2.5 hover:bg-navy-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+              className="gradient-hero text-white rounded-xl p-2.5 hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
               aria-label="Send message"
             >
               <Send className="w-4 h-4" />

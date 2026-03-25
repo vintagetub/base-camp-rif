@@ -68,7 +68,6 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Keyboard shortcut: / to focus search
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (
@@ -141,7 +140,7 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
           onKeyDown={handleKeyDown}
           placeholder={compact ? "Search... (/)" : "Search products, SKUs, brands..."}
           className={cn(
-            "w-full rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-amber/50 focus:bg-white/15 transition-all",
+            "w-full rounded-xl bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-amber/50 focus:bg-white/15 transition-all",
             compact ? "pl-9 pr-8 py-1.5 text-sm" : "pl-10 pr-10 py-2.5 text-sm"
           )}
         />
@@ -152,7 +151,7 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
               setResults([]);
               setIsOpen(false);
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -163,7 +162,7 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
       {isOpen && (results.length > 0 || (query && !isSearching)) && (
         <div
           ref={dropdownRef}
-          className="absolute top-full mt-2 w-full min-w-80 bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden z-50"
+          className="absolute top-full mt-2 w-full min-w-80 bg-white dark:bg-navy-800 rounded-xl shadow-elevated border border-gray-200 dark:border-navy-700 overflow-hidden z-50 animate-scale-in"
         >
           {isSearching && (
             <div className="px-4 py-3 flex items-center gap-2 text-sm text-gray-500">
@@ -181,11 +180,13 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
                     key={product.id}
                     onClick={() => navigateToProduct(product)}
                     className={cn(
-                      "w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0",
-                      selectedIndex === i && "bg-gray-50"
+                      "w-full flex items-center gap-3 px-4 py-3 text-left transition-colors border-b border-gray-100 dark:border-navy-700 last:border-0",
+                      selectedIndex === i
+                        ? "bg-navy-50 dark:bg-navy-700"
+                        : "hover:bg-gray-50 dark:hover:bg-navy-700/50"
                     )}
                   >
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 bg-gray-100 dark:bg-navy-700 rounded-xl overflow-hidden flex-shrink-0">
                       {product.images[0] ? (
                         <Image
                           src={product.images[0]}
@@ -202,13 +203,13 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                         {product.shortName || product.name}
                       </p>
-                      <p className="text-xs text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                         {product.brand} &middot; SKU: {product.sku}
                         {variantCount > 0 && (
-                          <span className="ml-1 text-navy font-medium">
+                          <span className="ml-1 text-navy dark:text-amber font-medium">
                             &middot; {variantCount} variant{variantCount !== 1 ? "s" : ""}
                           </span>
                         )}
@@ -225,7 +226,7 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
                     `/products?search=${encodeURIComponent(query.trim())}`
                   );
                 }}
-                className="w-full px-4 py-3 text-sm text-center text-navy font-medium hover:bg-navy/5 transition-colors"
+                className="w-full px-4 py-3 text-sm text-center text-navy dark:text-amber font-semibold hover:bg-navy/5 dark:hover:bg-amber/5 transition-colors"
               >
                 View all results for &ldquo;{query}&rdquo;
               </button>
@@ -243,7 +244,7 @@ export function SearchBar({ compact, onNavigate }: SearchBarProps) {
                   onNavigate?.();
                   router.push(`/products`);
                 }}
-                className="mt-2 text-sm text-navy font-medium hover:underline"
+                className="mt-2 text-sm text-navy dark:text-amber font-semibold hover:underline"
               >
                 Browse all products
               </button>

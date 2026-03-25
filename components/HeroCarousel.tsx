@@ -21,7 +21,7 @@ export function HeroCarousel() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true }),
+    Autoplay({ delay: 6000, stopOnInteraction: true, stopOnMouseEnter: true }),
   ]);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
@@ -41,6 +41,8 @@ export function HeroCarousel() {
     }
   };
 
+  const accentColor = CHANNEL.accentColor || "#f59e0b";
+
   return (
     <section className="relative overflow-hidden">
       {/* Carousel */}
@@ -49,42 +51,70 @@ export function HeroCarousel() {
           {SLIDES.map((src, i) => (
             <div
               key={i}
-              className="flex-[0_0_100%] min-w-0 relative aspect-[5/3] lg:aspect-[3/1]"
+              className="flex-[0_0_100%] min-w-0 relative aspect-[5/3] lg:aspect-[3/1] overflow-hidden"
             >
+              {/* Ken Burns effect: slow zoom + pan on active slide */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt={`Bath product showcase ${i + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
+                className={cn(
+                  "absolute inset-0 w-full h-full object-cover transition-transform duration-[8000ms] ease-out",
+                  selectedIndex === i ? "scale-110" : "scale-100"
+                )}
               />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent pointer-events-none" />
+      {/* Dramatic diagonal gradient overlay + vignette */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-950/85 via-navy-900/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950/40 to-transparent" />
+        {/* Subtle vignette */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 50%, rgba(10,22,40,0.3) 100%)" }} />
+      </div>
 
       {/* Static text overlay */}
       <div className="absolute inset-0 flex items-center pointer-events-none">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6 w-full">
           <div className="max-w-2xl pointer-events-auto">
-            <div className="inline-flex items-center gap-2 bg-amber/20 text-amber-light rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-              <Zap className="w-4 h-4" />
+            {/* Channel badge */}
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase mb-6 animate-fade-in-up"
+              style={{
+                backgroundColor: accentColor + "25",
+                color: accentColor,
+                border: `1px solid ${accentColor}40`,
+              }}
+            >
+              <Zap className="w-3.5 h-3.5" />
               {CHANNEL.id !== "all" ? `${CHANNEL.name} Pro Sales` : "Pro Sales Portal"}
             </div>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight mb-4 text-white">
+
+            <h1 className="text-display-xl text-white mb-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               The Pro Sales
               <br />
-              <span className="text-amber">Product Catalog</span>
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`,
+                }}
+              >
+                Product Catalog
+              </span>
             </h1>
-            <p className="text-base md:text-lg text-white/70 mb-8 max-w-xl">
+            <p className="text-base md:text-lg text-white/60 mb-8 max-w-xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               Search. Quote. Close. {CHANNEL.tagline}
             </p>
 
-            <form onSubmit={handleHeroSearch} className="max-w-xl relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-amber/40 via-amber/20 to-amber/40 rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center bg-white rounded-xl shadow-2xl overflow-hidden">
+            <form onSubmit={handleHeroSearch} className="max-w-xl relative group animate-fade-in-up" style={{ animationDelay: "300ms" }}>
+              <div
+                className="absolute -inset-1 rounded-2xl blur-xl opacity-40 group-hover:opacity-70 transition-opacity duration-500"
+                style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20, ${accentColor}40)` }}
+              />
+              <div className="relative flex items-center bg-white rounded-xl shadow-elevated overflow-hidden">
                 <Search className="w-5 h-5 text-gray-400 ml-5 shrink-0" />
                 <input
                   type="text"
@@ -95,7 +125,11 @@ export function HeroCarousel() {
                 />
                 <button
                   type="submit"
-                  className="bg-amber hover:bg-amber-dark text-navy font-semibold px-6 md:px-8 py-4 md:py-5 transition-colors shrink-0"
+                  className="font-semibold px-6 md:px-8 py-4 md:py-5 transition-all shrink-0 text-sm tracking-wide uppercase"
+                  style={{
+                    backgroundColor: accentColor,
+                    color: CHANNEL.id === "lowes" ? "#fff" : "#0A1628",
+                  }}
                 >
                   Search
                 </button>
@@ -105,34 +139,35 @@ export function HeroCarousel() {
         </div>
       </div>
 
-      {/* Prev/Next arrows (desktop only) */}
+      {/* Navigation arrows */}
       <button
         onClick={scrollPrev}
-        className="hidden lg:flex absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm items-center justify-center text-white hover:bg-white/30 transition-colors"
+        className="hidden lg:flex absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full glass border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all hover:scale-105"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
       <button
         onClick={scrollNext}
-        className="hidden lg:flex absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm items-center justify-center text-white hover:bg-white/30 transition-colors"
+        className="hidden lg:flex absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full glass border border-white/20 items-center justify-center text-white hover:bg-white/20 transition-all hover:scale-105"
         aria-label="Next slide"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      {/* Dots */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+      {/* Dots — redesigned with progress bar style */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => emblaApi?.scrollTo(i)}
             className={cn(
-              "h-2 rounded-full transition-all",
+              "h-1.5 rounded-full transition-all duration-500",
               selectedIndex === i
-                ? "w-6 bg-amber"
-                : "w-2 bg-white/50 hover:bg-white/70"
+                ? "w-8"
+                : "w-2 bg-white/40 hover:bg-white/60"
             )}
+            style={selectedIndex === i ? { backgroundColor: accentColor } : undefined}
             aria-label={`Go to slide ${i + 1}`}
           />
         ))}
