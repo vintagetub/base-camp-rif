@@ -94,6 +94,7 @@ export function ProResources() {
                   controls
                   className="w-full h-full"
                   preload="metadata"
+                  poster={CHANNEL.proTeamVideo.replace(/\.mp4$/, ".jpg").replace("/upload/", "/upload/so_0,w_800,f_auto/")}
                 >
                   <source
                     src={CHANNEL.proTeamVideo}
@@ -119,6 +120,7 @@ export function ProResources() {
                     controls
                     className="w-full h-full"
                     preload="metadata"
+                    poster="https://res.cloudinary.com/american-bath-group/video/upload/so_0,w_800,f_auto/v1759503905/abg-graphics/videos/abg/retail-pro/lowes/retail-pro-videos-lowes.jpg"
                   >
                     <source
                       src="https://res.cloudinary.com/american-bath-group/video/upload/v1759503905/abg-graphics/videos/abg/retail-pro/lowes/retail-pro-videos-lowes.mp4"

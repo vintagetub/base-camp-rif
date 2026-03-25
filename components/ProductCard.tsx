@@ -298,7 +298,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       {/* ------------------------------------------------------------------ */}
       {/*  Info section                                                      */}
       {/* ------------------------------------------------------------------ */}
-      <div className="flex flex-col flex-1 px-3.5 pt-3 pb-3.5">
+      <div className="flex flex-col flex-1 px-2.5 sm:px-3.5 pt-2.5 sm:pt-3 pb-2.5 sm:pb-3.5">
         {/* Category pill */}
         {product.category && product.category !== "Uncategorized" && (
           <Badge variant="secondary" className="self-start text-[10px] mb-1.5">
@@ -307,7 +307,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         )}
 
         {/* Product name */}
-        <h3 className="font-display font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-navy transition-colors mb-auto">
+        <h3 className="font-display font-semibold text-gray-900 text-xs sm:text-sm leading-snug line-clamp-2 group-hover:text-navy transition-colors mb-auto">
           {displayName}
         </h3>
 

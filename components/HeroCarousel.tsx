@@ -93,7 +93,7 @@ export function HeroCarousel() {
               {CHANNEL.id !== "all" ? `${CHANNEL.name} Pro Sales` : "Pro Sales Portal"}
             </div>
 
-            <h1 className="text-display-xl text-white mb-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+            <h1 className="text-3xl sm:text-display-lg md:text-display-xl text-white mb-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               The Pro Sales
               <br />
               <span
