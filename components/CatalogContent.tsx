@@ -111,7 +111,7 @@ export function CatalogContent() {
         )}
       </div>
 
-      <div className="flex gap-6 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <FilterSidebar
           brands={brands}
           categories={categories}
@@ -159,8 +159,8 @@ export function CatalogContent() {
           )}
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between mb-6 gap-3 bg-white rounded-xl px-3 sm:px-4 py-3 shadow-card border border-border-subtle">
-            <p className="text-sm text-text-secondary">
+          <div className="flex items-center justify-between mb-6 gap-2 sm:gap-3 bg-white rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 shadow-card border border-border-subtle">
+            <p className="text-xs sm:text-sm text-text-secondary shrink-0">
               <span className="font-semibold text-text-primary">
                 {allResults.length > 0 ? startIndex + 1 : 0}&ndash;{Math.min(startIndex + PAGE_SIZE, allResults.length)}
               </span>{" "}
@@ -168,10 +168,10 @@ export function CatalogContent() {
               <span className="font-semibold text-text-primary">
                 {allResults.length.toLocaleString()}
               </span>{" "}
-              products
+              <span className="hidden sm:inline">products</span>
             </p>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <select
                   value={filters.sort || "default"}
@@ -189,7 +189,7 @@ export function CatalogContent() {
                 <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary pointer-events-none" />
               </div>
 
-              <div className="flex border border-border-subtle rounded-lg overflow-hidden">
+              <div className="hidden sm:flex border border-border-subtle rounded-lg overflow-hidden">
                 <button
                   onClick={() => setView("grid")}
                   className={cn(

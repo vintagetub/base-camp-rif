@@ -221,28 +221,28 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       {/* ------------------------------------------------------------------ */}
       {/*  Top bar: brand logo + badges                                     */}
       {/* ------------------------------------------------------------------ */}
-      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-gray-100">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-2 sm:px-3.5 py-2 sm:py-2.5 border-b border-gray-100 min-w-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
           <BrandLogo
             logo={brandInfo.logo}
             brandName={brandInfo.name}
             brandColor={brandInfo.color}
-            size={22}
+            size={20}
           />
           <span
-            className="text-[11px] font-semibold truncate max-w-[100px]"
+            className="text-[10px] sm:text-[11px] font-semibold truncate"
             style={{ color: brandInfo.color }}
           >
             {product.brand}
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           {variantCount > 0 && (
             <Badge
               variant="outline"
-              className="gap-0.5 border-purple-300 bg-purple-50 text-purple-700 text-[10px] leading-none"
+              className="gap-0.5 border-purple-300 bg-purple-50 text-purple-700 text-[9px] sm:text-[10px] leading-none px-1 sm:px-1.5"
             >
-              {variantCount} options
+              {variantCount} <span className="hidden sm:inline">options</span><span className="sm:hidden">opt</span>
             </Badge>
           )}
           {isAda && <AdaBadge />}
@@ -325,10 +325,10 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         </p>
 
         {/* Price + Add to Quote row */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+        <div className="flex items-center justify-between mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-gray-100">
           {hasPrice ? (
-            <div>
-              <p className="text-lg font-bold text-navy leading-tight font-display">
+            <div className="min-w-0">
+              <p className="text-sm sm:text-lg font-bold text-navy leading-tight font-display">
                 {formatPrice(price)}
               </p>
               {product.pricing.msrp &&
@@ -339,7 +339,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
                 )}
             </div>
           ) : (
-            <p className="text-sm font-semibold text-navy">
+            <p className="text-xs sm:text-sm font-semibold text-navy">
               Request Quote
             </p>
           )}
@@ -347,9 +347,9 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             size="sm"
             variant="amber"
             onClick={handleAddToQuote}
-            className="shrink-0 group/btn hover:scale-105 transition-transform"
+            className="shrink-0 group/btn hover:scale-105 transition-transform !p-1.5 sm:!p-2"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
           </Button>
         </div>
       </div>
