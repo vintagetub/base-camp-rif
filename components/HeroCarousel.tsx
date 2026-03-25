@@ -125,11 +125,7 @@ export function HeroCarousel() {
                 />
                 <button
                   type="submit"
-                  className="font-semibold px-6 md:px-8 py-4 md:py-5 transition-all shrink-0 text-sm tracking-wide uppercase"
-                  style={{
-                    backgroundColor: accentColor,
-                    color: CHANNEL.id === "lowes" ? "#fff" : "#0A1628",
-                  }}
+                  className="font-bold px-6 md:px-8 py-4 md:py-5 transition-all shrink-0 text-sm tracking-wide bg-navy text-white hover:bg-navy-light"
                 >
                   Search
                 </button>

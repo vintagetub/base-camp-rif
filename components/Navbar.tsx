@@ -138,7 +138,7 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-50 transition-all duration-500 ease-out",
           scrolled
-            ? "glass shadow-elevated border-b border-white/10"
+            ? "bg-white dark:bg-navy-900 shadow-elevated border-b border-gray-200 dark:border-navy-700"
             : "bg-navy"
         )}
       >
@@ -166,7 +166,7 @@ export function Navbar() {
                 className={cn(
                   "transition-all duration-500",
                   scrolled ? "h-6" : "h-8",
-                  scrolled ? "brightness-100 dark:invert" : "brightness-0 invert"
+                  scrolled ? "" : "brightness-0 invert"
                 )}
               />
               <span
@@ -191,11 +191,11 @@ export function Navbar() {
                     key={link.href}
                     href={link.href}
                     className={cn(
-                      "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      "relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
                       scrolled
                         ? isActive
-                          ? "text-navy-800 bg-navy-50 dark:text-white dark:bg-white/10"
-                          : "text-gray-600 hover:text-navy-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
+                          ? "text-navy bg-navy/8 dark:text-white dark:bg-white/10"
+                          : "text-gray-700 hover:text-navy hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
                         : isActive
                           ? "text-white bg-white/15"
                           : "text-white/75 hover:bg-white/10 hover:text-white"
@@ -221,7 +221,7 @@ export function Navbar() {
                 className={cn(
                   "p-2 rounded-lg transition-all flex items-center gap-2",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300 dark:hover:bg-white/10"
+                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Search"
@@ -231,7 +231,7 @@ export function Navbar() {
                   className={cn(
                     "hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono",
                     scrolled
-                      ? "bg-gray-100 text-gray-400 dark:bg-white/10 dark:text-gray-500"
+                      ? "bg-gray-200 text-gray-500 dark:bg-white/10 dark:text-gray-500"
                       : "bg-white/10 text-white/40"
                   )}
                 >
@@ -248,7 +248,7 @@ export function Navbar() {
                 className={cn(
                   "relative p-2 rounded-lg transition-all",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300 dark:hover:bg-white/10"
+                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Open quote cart"
@@ -273,7 +273,7 @@ export function Navbar() {
                 className={cn(
                   "p-2 rounded-lg transition-colors md:hidden",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300"
+                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Menu"
