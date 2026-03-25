@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ShoppingCart, Menu, X, Search, Ruler } from "lucide-react";
+import { ShoppingCart, Menu, X, Search } from "lucide-react";
 import { ThemeToggle } from "./ThemeProvider";
 import { useQuoteStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -32,9 +32,9 @@ export function Navbar() {
   const itemCount = useQuoteStore((s) => s.getItemCount());
   const toggleDrawer = useQuoteStore((s) => s.toggleDrawer);
 
-  /* ---------------------------------------------------------------- */
-  /*  Scroll detection for shrink behavior                            */
-  /* ---------------------------------------------------------------- */
+  // Channel accent color
+  const accentColor = CHANNEL.accentColor;
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -43,27 +43,17 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  /* ---------------------------------------------------------------- */
-  /*  Keyboard shortcuts                                              */
-  /* ---------------------------------------------------------------- */
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const isInput = ["INPUT", "TEXTAREA", "SELECT"].includes(tag);
-
-      // "/" to open search
       if (e.key === "/" && !isInput) {
         e.preventDefault();
         setSearchOpen(true);
       }
-
-      // "c" for chat
       if (e.key === "c" && !isInput && !e.metaKey && !e.ctrlKey) {
-        // Dispatch a custom event that the chat widget can listen to
         window.dispatchEvent(new CustomEvent("open-chat"));
       }
-
-      // Escape to close search
       if (e.key === "Escape" && searchOpen) {
         closeSearch();
       }
@@ -72,20 +62,13 @@ export function Navbar() {
     return () => document.removeEventListener("keydown", handler);
   }, [searchOpen]);
 
-  /* ---------------------------------------------------------------- */
-  /*  Focus input when search overlay opens                           */
-  /* ---------------------------------------------------------------- */
   useEffect(() => {
     if (searchOpen) {
-      // Small delay so the overlay renders first
       const t = setTimeout(() => searchInputRef.current?.focus(), 50);
       return () => clearTimeout(t);
     }
   }, [searchOpen]);
 
-  /* ---------------------------------------------------------------- */
-  /*  Search logic                                                    */
-  /* ---------------------------------------------------------------- */
   const doSearch = useCallback((q: string) => {
     if (!q.trim()) {
       setResults([]);
@@ -153,14 +136,24 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "sticky top-0 z-50 bg-navy text-white shadow-lg transition-all duration-300",
-          scrolled ? "shadow-xl" : ""
+          "sticky top-0 z-50 transition-all duration-500 ease-out",
+          scrolled
+            ? "glass shadow-elevated border-b border-white/10"
+            : "bg-navy"
         )}
       >
+        {/* Channel accent bar */}
+        {accentColor && (
+          <div
+            className="h-0.5 w-full"
+            style={{ background: `linear-gradient(90deg, ${accentColor}, ${accentColor}88, ${accentColor})` }}
+          />
+        )}
+
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <div
             className={cn(
-              "flex items-center justify-between transition-all duration-300",
+              "flex items-center justify-between transition-all duration-500",
               scrolled ? "h-14" : "h-[72px]"
             )}
           >
@@ -171,32 +164,53 @@ export function Navbar() {
                 src="https://res.cloudinary.com/american-bath-group/image/upload/v1648488050/abg-graphics/logos/abg/abg-logos/svg/abg-logo-horizontal.svg"
                 alt="American Bath Group"
                 className={cn(
-                  "brightness-0 invert transition-all duration-300",
-                  scrolled ? "h-6" : "h-8"
+                  "transition-all duration-500",
+                  scrolled ? "h-6" : "h-8",
+                  scrolled ? "brightness-100 dark:invert" : "brightness-0 invert"
                 )}
               />
-              <span className="hidden sm:inline text-xs font-bold bg-amber/20 text-amber-light px-2 py-0.5 rounded tracking-wide">
+              <span
+                className={cn(
+                  "hidden sm:inline text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md transition-all",
+                  scrolled
+                    ? "text-navy-700 bg-navy-50 dark:text-amber dark:bg-amber/10"
+                    : "text-amber-light bg-white/10"
+                )}
+                style={accentColor && !scrolled ? { backgroundColor: accentColor + "30", color: accentColor } : undefined}
+              >
                 {CHANNEL.id !== "all" ? `${CHANNEL.name.toUpperCase()} PRO` : "PRO SALES"}
               </span>
             </Link>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-1">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={cn(
-                    "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                    pathname === link.href ||
-                      pathname.startsWith(link.href + "/")
-                      ? "bg-white/15 text-white"
-                      : "text-white/80 hover:bg-white/10 hover:text-white"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <nav className="hidden md:flex items-center gap-0.5">
+              {NAV_LINKS.map((link) => {
+                const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      scrolled
+                        ? isActive
+                          ? "text-navy-800 bg-navy-50 dark:text-white dark:bg-white/10"
+                          : "text-gray-600 hover:text-navy-800 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
+                        : isActive
+                          ? "text-white bg-white/15"
+                          : "text-white/75 hover:bg-white/10 hover:text-white"
+                    )}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <span
+                        className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full"
+                        style={{ backgroundColor: accentColor || "#f59e0b" }}
+                      />
+                    )}
+                  </Link>
+                );
+              })}
             </nav>
 
             {/* Right side actions */}
@@ -204,14 +218,23 @@ export function Navbar() {
               {/* Search button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors flex items-center gap-2"
+                className={cn(
+                  "p-2 rounded-lg transition-all flex items-center gap-2",
+                  scrolled
+                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300 dark:hover:bg-white/10"
+                    : "hover:bg-white/10 text-white/80"
+                )}
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
-                <span className="hidden md:inline text-sm text-white/60">
-                  Search
-                </span>
-                <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/10 text-white/50 text-xs font-mono">
+                <kbd
+                  className={cn(
+                    "hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono",
+                    scrolled
+                      ? "bg-gray-100 text-gray-400 dark:bg-white/10 dark:text-gray-500"
+                      : "bg-white/10 text-white/40"
+                  )}
+                >
                   /
                 </kbd>
               </button>
@@ -222,12 +245,23 @@ export function Navbar() {
               {/* Cart button */}
               <button
                 onClick={toggleDrawer}
-                className="relative p-2 rounded-lg hover:bg-white/10 transition-colors"
+                className={cn(
+                  "relative p-2 rounded-lg transition-all",
+                  scrolled
+                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300 dark:hover:bg-white/10"
+                    : "hover:bg-white/10 text-white/80"
+                )}
                 aria-label="Open quote cart"
               >
                 <ShoppingCart className="w-5 h-5" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-amber text-navy text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse-soft">
+                  <span
+                    className="absolute -top-0.5 -right-0.5 text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm"
+                    style={{
+                      backgroundColor: accentColor || "#f59e0b",
+                      color: accentColor ? "#fff" : "#0A1628",
+                    }}
+                  >
                     {itemCount > 99 ? "99+" : itemCount}
                   </span>
                 )}
@@ -236,7 +270,12 @@ export function Navbar() {
               {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors md:hidden"
+                className={cn(
+                  "p-2 rounded-lg transition-colors md:hidden",
+                  scrolled
+                    ? "hover:bg-gray-100 text-gray-600 dark:text-gray-300"
+                    : "hover:bg-white/10 text-white/80"
+                )}
                 aria-label="Menu"
               >
                 {mobileMenuOpen ? (
@@ -250,45 +289,59 @@ export function Navbar() {
         </div>
 
         {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-white/10 bg-navy-dark">
-            <nav className="px-4 py-3 space-y-1">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                    pathname === link.href
+        <div
+          className={cn(
+            "md:hidden overflow-hidden transition-all duration-300 ease-out",
+            mobileMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
+          )}
+        >
+          <nav
+            className={cn(
+              "px-4 py-3 space-y-1 border-t",
+              scrolled
+                ? "border-gray-200 bg-white dark:bg-navy-900 dark:border-white/10"
+                : "border-white/10 bg-navy-dark"
+            )}
+          >
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={cn(
+                  "block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                  scrolled
+                    ? pathname === link.href
+                      ? "bg-navy-50 text-navy-800 dark:bg-white/10 dark:text-white"
+                      : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/10"
+                    : pathname === link.href
                       ? "bg-white/15 text-white"
                       : "text-white/80 hover:bg-white/10"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        )}
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
       </header>
 
       {/* ============================================================ */}
-      {/*  SEARCH OVERLAY (command palette style)                      */}
+      {/*  SEARCH OVERLAY                                              */}
       {/* ============================================================ */}
       {searchOpen && (
         <div className="fixed inset-0 z-[60]">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-navy-900/70 backdrop-blur-sm"
+            className="absolute inset-0 bg-navy-950/60 backdrop-blur-md animate-fade-in"
             onClick={closeSearch}
           />
 
           {/* Search panel */}
-          <div className="relative max-w-2xl mx-auto mt-[15vh] px-4">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden animate-fade-in-up">
+          <div className="relative max-w-2xl mx-auto mt-[12vh] px-4">
+            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-elevated overflow-hidden animate-scale-in border border-gray-200 dark:border-navy-700">
               {/* Search input */}
-              <div className="flex items-center gap-3 px-5 border-b border-gray-200">
+              <div className="flex items-center gap-3 px-5 border-b border-gray-200 dark:border-navy-700">
                 <Search className="w-5 h-5 text-gray-400 shrink-0" />
                 <input
                   ref={searchInputRef}
@@ -300,7 +353,7 @@ export function Navbar() {
                   }}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search products, SKUs, brands..."
-                  className="flex-1 py-4 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none"
+                  className="flex-1 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
                 />
                 {query && (
                   <button
@@ -308,12 +361,12 @@ export function Navbar() {
                       setQuery("");
                       setResults([]);
                     }}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 )}
-                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded bg-gray-100 text-gray-400 text-xs font-mono">
+                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded-md bg-gray-100 dark:bg-navy-700 text-gray-400 text-xs font-mono">
                   ESC
                 </kbd>
               </div>
@@ -326,11 +379,13 @@ export function Navbar() {
                       key={product.id}
                       onClick={() => navigateToProduct(product)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-5 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0",
-                        selectedIndex === i && "bg-gray-50"
+                        "w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-gray-100 dark:border-navy-700 last:border-0",
+                        selectedIndex === i
+                          ? "bg-navy-50 dark:bg-navy-700"
+                          : "hover:bg-gray-50 dark:hover:bg-navy-700/50"
                       )}
                     >
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shrink-0">
+                      <div className="w-12 h-12 bg-gray-100 dark:bg-navy-700 rounded-lg overflow-hidden shrink-0">
                         {product.images[0] ? (
                           <Image
                             src={product.images[0]}
@@ -347,20 +402,20 @@ export function Navbar() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                           {product.shortName || product.name}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {product.brand} &middot; SKU: {product.sku}
                           {product.isParent && product.childVariantIds && product.childVariantIds.length > 0 && (
-                            <span className="ml-1 text-navy font-medium">
+                            <span className="ml-1 text-navy dark:text-amber font-medium">
                               &middot; {product.childVariantIds.length} variant{product.childVariantIds.length !== 1 ? "s" : ""}
                             </span>
                           )}
                         </p>
                       </div>
                       {price(product) && (
-                        <span className="text-sm font-semibold text-navy shrink-0">
+                        <span className="text-sm font-bold text-navy dark:text-amber shrink-0">
                           {price(product)}
                         </span>
                       )}
@@ -373,7 +428,7 @@ export function Navbar() {
                         `/products?search=${encodeURIComponent(query.trim())}`
                       );
                     }}
-                    className="w-full px-5 py-3 text-sm text-center text-navy font-medium hover:bg-navy/5 transition-colors"
+                    className="w-full px-5 py-3 text-sm text-center text-navy dark:text-amber font-semibold hover:bg-navy/5 dark:hover:bg-amber/5 transition-colors"
                   >
                     View all results for &ldquo;{query}&rdquo;
                   </button>
@@ -390,7 +445,7 @@ export function Navbar() {
                       closeSearch();
                       router.push(`/products`);
                     }}
-                    className="mt-2 text-sm text-navy font-medium hover:underline"
+                    className="mt-2 text-sm text-navy dark:text-amber font-medium hover:underline"
                   >
                     Browse all products
                   </button>
@@ -404,19 +459,19 @@ export function Navbar() {
                   </p>
                   <div className="flex items-center justify-center gap-4 mt-3 text-xs text-gray-400">
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
                         &uarr;&darr;
                       </kbd>
                       Navigate
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
                         Enter
                       </kbd>
                       Select
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded bg-gray-100 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
                         Esc
                       </kbd>
                       Close

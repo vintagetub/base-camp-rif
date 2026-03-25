@@ -45,7 +45,7 @@ function BrandLogo({
 
   return (
     <span
-      className="inline-flex items-center justify-center rounded-md text-[11px] font-bold text-white select-none"
+      className="inline-flex items-center justify-center rounded-lg text-[11px] font-bold text-white select-none"
       style={{
         backgroundColor: brandColor,
         width: size,
@@ -112,19 +112,19 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         href={`/products/${product.id}`}
         className={cn(
           "group flex items-center gap-5 p-4 bg-white rounded-xl border border-gray-200",
-          "hover:shadow-card-hover hover:border-navy/30",
-          "transition-all duration-200 ease-out",
+          "hover:shadow-card-hover hover:border-navy/20",
+          "transition-all duration-300 ease-out",
           "hover:-translate-y-0.5"
         )}
       >
         {/* Thumbnail */}
-        <div className="relative w-28 h-[84px] bg-gray-50 rounded-lg overflow-hidden flex-shrink-0">
+        <div className="relative w-28 h-[84px] bg-gray-50 rounded-xl overflow-hidden flex-shrink-0">
           {product.images[0] ? (
             <Image
               src={product.images[0]}
               alt={displayName}
               fill
-              className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
+              className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
               sizes="112px"
               unoptimized
             />
@@ -140,7 +140,6 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          {/* Top meta row */}
           <div className="flex items-center gap-2 mb-1.5">
             <BrandLogo
               logo={brandInfo.logo}
@@ -167,12 +166,10 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             {isAda && <AdaBadge />}
           </div>
 
-          {/* Name */}
-          <h3 className="font-medium text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-navy transition-colors">
+          <h3 className="font-display font-semibold text-gray-900 text-sm leading-snug line-clamp-1 group-hover:text-navy transition-colors">
             {displayName}
           </h3>
 
-          {/* SKU + finish */}
           <div className="flex items-center gap-3 mt-1">
             <p className="text-xs text-gray-400 font-sku">
               SKU: {product.sku}
@@ -189,7 +186,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         <div className="flex items-center gap-4 shrink-0">
           <div className="text-right">
             {hasPrice ? (
-              <p className="text-lg font-bold text-navy">
+              <p className="text-lg font-bold text-navy font-display">
                 {formatPrice(price)}
               </p>
             ) : (
@@ -214,26 +211,26 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
     <Link
       href={`/products/${product.id}`}
       className={cn(
-        "group flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden",
-        "shadow-card",
-        "hover:shadow-card-hover hover:border-navy/30",
-        "hover:-translate-y-[2px]",
-        "transition-all duration-200 ease-out"
+        "group flex flex-col bg-white rounded-2xl border border-gray-200 overflow-hidden",
+        "shadow-card card-accent-top",
+        "hover:shadow-card-hover hover:border-transparent",
+        "hover:-translate-y-1",
+        "transition-all duration-300 ease-out"
       )}
     >
       {/* ------------------------------------------------------------------ */}
-      {/*  Top bar: brand logo + ADA badge                                   */}
+      {/*  Top bar: brand logo + badges                                     */}
       {/* ------------------------------------------------------------------ */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100">
+      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-gray-100">
         <div className="flex items-center gap-2">
           <BrandLogo
             logo={brandInfo.logo}
             brandName={brandInfo.name}
             brandColor={brandInfo.color}
-            size={24}
+            size={22}
           />
           <span
-            className="text-xs font-semibold truncate max-w-[100px]"
+            className="text-[11px] font-semibold truncate max-w-[100px]"
             style={{ color: brandInfo.color }}
           >
             {product.brand}
@@ -253,7 +250,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/*  Product image (4:3 aspect ratio, zoom on hover)                   */}
+      {/*  Product image with hover overlay                                  */}
       {/* ------------------------------------------------------------------ */}
       <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
         {product.images[0] ? (
@@ -263,8 +260,8 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             fill
             className={cn(
               "object-contain p-4",
-              "transition-transform duration-200 ease-out",
-              "group-hover:scale-105"
+              "transition-transform duration-500 ease-out",
+              "group-hover:scale-108"
             )}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             unoptimized
@@ -272,10 +269,10 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         ) : (
           <div
             className="w-full h-full flex flex-col items-center justify-center"
-            style={{ backgroundColor: brandInfo.color + "12" }}
+            style={{ backgroundColor: brandInfo.color + "08" }}
           >
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold text-white"
               style={{ backgroundColor: brandInfo.color }}
             >
               {product.brand[0]}
@@ -289,9 +286,9 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
           </div>
         )}
 
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-navy/0 group-hover:bg-navy/5 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-          <span className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 text-xs font-medium text-navy flex items-center gap-1 shadow">
+        {/* Hover overlay — gradient wash + view details */}
+        <div className="absolute inset-0 bg-gradient-to-t from-navy/15 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+          <span className="glass rounded-full px-4 py-2 text-xs font-semibold text-navy flex items-center gap-1.5 shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
             <Eye className="w-3.5 h-3.5" />
             View Details
           </span>
@@ -301,7 +298,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
       {/* ------------------------------------------------------------------ */}
       {/*  Info section                                                      */}
       {/* ------------------------------------------------------------------ */}
-      <div className="flex flex-col flex-1 px-3 pt-3 pb-3">
+      <div className="flex flex-col flex-1 px-3.5 pt-3 pb-3.5">
         {/* Category pill */}
         {product.category && product.category !== "Uncategorized" && (
           <Badge variant="secondary" className="self-start text-[10px] mb-1.5">
@@ -309,8 +306,8 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
           </Badge>
         )}
 
-        {/* Product name (2 line max) */}
-        <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-navy transition-colors mb-auto">
+        {/* Product name */}
+        <h3 className="font-display font-semibold text-gray-900 text-sm leading-snug line-clamp-2 group-hover:text-navy transition-colors mb-auto">
           {displayName}
         </h3>
 
@@ -331,7 +328,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
           {hasPrice ? (
             <div>
-              <p className="text-lg font-bold text-navy leading-tight">
+              <p className="text-lg font-bold text-navy leading-tight font-display">
                 {formatPrice(price)}
               </p>
               {product.pricing.msrp &&
@@ -350,7 +347,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
             size="sm"
             variant="amber"
             onClick={handleAddToQuote}
-            className="shrink-0"
+            className="shrink-0 group/btn hover:scale-105 transition-transform"
           >
             <Plus className="w-4 h-4" />
           </Button>

@@ -21,7 +21,6 @@ export function QuoteDrawer() {
     getItemCount,
   } = useQuoteStore();
 
-  // Close on escape, toggle on Q
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isDrawerOpen) setDrawerOpen(false);
@@ -39,7 +38,6 @@ export function QuoteDrawer() {
     return () => document.removeEventListener("keydown", handler);
   }, [isDrawerOpen, setDrawerOpen]);
 
-  // Prevent body scroll when open
   useEffect(() => {
     if (isDrawerOpen) {
       document.body.style.overflow = "hidden";
@@ -54,7 +52,6 @@ export function QuoteDrawer() {
   const subtotal = getSubtotal();
   const count = getItemCount();
 
-  // Group items by brand
   const groupedItems = useMemo(() => {
     const groups: Record<string, typeof items> = {};
     items.forEach((item) => {
@@ -62,7 +59,6 @@ export function QuoteDrawer() {
       if (!groups[brand]) groups[brand] = [];
       groups[brand].push(item);
     });
-    // Sort brand groups alphabetically
     return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
   }, [items]);
 
@@ -71,7 +67,7 @@ export function QuoteDrawer() {
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/40 backdrop-blur-sm z-50 transition-opacity duration-300",
+          "fixed inset-0 bg-navy-950/40 backdrop-blur-sm z-50 transition-all duration-300",
           isDrawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
         onClick={() => setDrawerOpen(false)}
@@ -80,91 +76,94 @@ export function QuoteDrawer() {
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-drawer z-50 flex flex-col transition-transform duration-300 ease-out font-[var(--font-jakarta)]",
+          "fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-navy-800 shadow-drawer z-50 flex flex-col transition-transform duration-350 ease-[cubic-bezier(0.22,1,0.36,1)]",
           isDrawerOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5 text-navy" />
-            <h2 className="font-semibold text-navy text-lg">Quote Cart</h2>
-            {count > 0 && (
-              <span className="bg-amber text-navy text-xs font-bold rounded-full px-2 py-0.5">
-                {count}
-              </span>
-            )}
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-navy-700 bg-gray-50 dark:bg-navy-900">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-navy/10 dark:bg-amber/10 flex items-center justify-center">
+              <ShoppingCart className="w-4.5 h-4.5 text-navy dark:text-amber" />
+            </div>
+            <div>
+              <h2 className="font-display font-bold text-navy dark:text-white text-base">Quote Cart</h2>
+              {count > 0 && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">{count} item{count !== 1 ? "s" : ""}</p>
+              )}
+            </div>
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
-            className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-navy-700 transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-5">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center px-6">
-              <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                <ShoppingCart className="w-12 h-12 text-gray-200" />
+              <div className="w-20 h-20 bg-gray-50 dark:bg-navy-700 rounded-2xl flex items-center justify-center mb-5">
+                <ShoppingCart className="w-10 h-10 text-gray-200 dark:text-gray-600" />
               </div>
-              <h3 className="font-semibold text-gray-700 mb-1 text-lg">
+              <h3 className="font-display font-bold text-gray-700 dark:text-gray-300 mb-1.5 text-lg">
                 Your quote cart is empty
               </h3>
-              <p className="text-sm text-gray-400 mb-6 max-w-[240px]">
+              <p className="text-sm text-gray-400 dark:text-gray-500 mb-6 max-w-[240px] leading-relaxed">
                 Browse our catalog and add products to start building your
                 custom quote
               </p>
               <Button
                 variant="amber"
                 onClick={() => setDrawerOpen(false)}
+                className="rounded-xl"
               >
                 Browse Products
               </Button>
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-6">
               {groupedItems.map(([brand, brandItems]) => {
                 const brandInfo = getBrandInfo(brand);
                 return (
                   <div key={brand}>
                     {/* Brand header */}
-                    <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-100">
+                    <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-100 dark:border-navy-700">
                       {brandInfo.logo ? (
                         <Image
                           src={brandInfo.logo}
                           alt={brand}
                           width={60}
                           height={24}
-                          className="h-6 w-auto object-contain"
+                          className="h-5 w-auto object-contain"
                           unoptimized
                         />
                       ) : (
                         <div
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                          className="w-5 h-5 rounded-md flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
                           style={{ backgroundColor: brandInfo.color }}
                         >
                           {brand[0]}
                         </div>
                       )}
-                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider font-display">
                         {brand}
                       </span>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-[10px] text-gray-300 dark:text-gray-600">
                         ({brandItems.length})
                       </span>
                     </div>
 
                     {/* Brand items */}
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       {brandItems.map((item) => (
                         <div
                           key={item.id}
-                          className="flex gap-3 p-3 bg-gray-50 rounded-xl"
+                          className="flex gap-3 p-3 bg-gray-50 dark:bg-navy-700/50 rounded-xl"
                         >
-                          <div className="w-14 h-14 bg-white rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                          <div className="w-14 h-14 bg-white dark:bg-navy-800 rounded-xl overflow-hidden flex-shrink-0 border border-gray-200 dark:border-navy-600">
                             {item.image ? (
                               <Image
                                 src={item.image}
@@ -176,9 +175,9 @@ export function QuoteDrawer() {
                               />
                             ) : (
                               <div
-                                className="w-full h-full flex items-center justify-center text-white text-xs font-bold"
+                                className="w-full h-full flex items-center justify-center text-xs font-bold"
                                 style={{
-                                  backgroundColor: brandInfo.color + "20",
+                                  backgroundColor: brandInfo.color + "15",
                                   color: brandInfo.color,
                                 }}
                               >
@@ -187,14 +186,14 @@ export function QuoteDrawer() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900 truncate leading-snug">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate leading-snug">
                               {item.name}
                             </p>
-                            <p className="text-xs text-gray-400 font-mono mt-0.5">
+                            <p className="text-[11px] text-gray-400 font-mono mt-0.5">
                               {item.sku}
                             </p>
                             <div className="flex items-center gap-2 mt-2">
-                              <div className="flex items-center border border-gray-300 rounded-lg bg-white">
+                              <div className="flex items-center border border-gray-200 dark:border-navy-600 rounded-lg bg-white dark:bg-navy-800 overflow-hidden">
                                 <button
                                   onClick={() =>
                                     updateQuantity(
@@ -202,11 +201,11 @@ export function QuoteDrawer() {
                                       item.quantity - 1
                                     )
                                   }
-                                  className="p-1 hover:bg-gray-100 rounded-l-lg transition-colors"
+                                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="px-3 text-sm font-medium min-w-[2rem] text-center">
+                                <span className="px-3 text-sm font-semibold min-w-[2rem] text-center tabular-nums">
                                   {item.quantity}
                                 </span>
                                 <button
@@ -216,35 +215,35 @@ export function QuoteDrawer() {
                                       item.quantity + 1
                                     )
                                   }
-                                  className="p-1 hover:bg-gray-100 rounded-r-lg transition-colors"
+                                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
                               </div>
                               <button
                                 onClick={() => removeItem(item.id)}
-                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
                           </div>
                           <div className="text-right shrink-0">
                             {item.price ? (
                               <>
-                                <p className="text-sm font-bold text-navy">
+                                <p className="text-sm font-bold text-navy dark:text-amber font-display">
                                   {formatPrice(
                                     parseFloat(item.price) * item.quantity
                                   )}
                                 </p>
                                 {item.quantity > 1 && (
-                                  <p className="text-xs text-gray-400">
+                                  <p className="text-[11px] text-gray-400">
                                     {formatPrice(item.price)} ea
                                   </p>
                                 )}
                               </>
                             ) : (
-                              <p className="text-xs text-amber-dark font-medium">
+                              <p className="text-[11px] text-amber-dark font-medium">
                                 TBD
                               </p>
                             )}
@@ -261,10 +260,10 @@ export function QuoteDrawer() {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-gray-200 p-4 bg-gray-50 space-y-3">
+          <div className="border-t border-gray-200 dark:border-navy-700 p-5 bg-gray-50 dark:bg-navy-900 space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Estimated Subtotal</span>
-              <span className="text-xl font-bold text-navy">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Estimated Subtotal</span>
+              <span className="text-xl font-bold text-navy dark:text-white font-display">
                 {formatPrice(subtotal)}
               </span>
             </div>
@@ -278,7 +277,7 @@ export function QuoteDrawer() {
                 variant="outline"
                 size="sm"
                 onClick={clearAll}
-                className="flex-1"
+                className="flex-1 rounded-xl"
               >
                 <Trash2 className="w-4 h-4" />
                 Clear All
@@ -288,7 +287,7 @@ export function QuoteDrawer() {
                 className="flex-1"
                 onClick={() => setDrawerOpen(false)}
               >
-                <Button variant="amber" size="sm" className="w-full">
+                <Button variant="amber" size="sm" className="w-full rounded-xl">
                   Submit Quote
                   <ArrowRight className="w-4 h-4" />
                 </Button>

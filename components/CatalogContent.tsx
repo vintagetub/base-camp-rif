@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { LayoutGrid, List, ChevronDown, Search, X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from "lucide-react";
+import { LayoutGrid, List, ChevronDown, Search, X, ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight, Package } from "lucide-react";
 import { ProductCard } from "./ProductCard";
 import { FilterSidebar } from "./FilterSidebar";
 import { Button } from "./ui/button";
@@ -58,7 +58,6 @@ export function CatalogContent() {
   const facets = useMemo(() => computeFacets({ ...filters, parentsOnly: true }), [filters]);
   const { brands, categories, colors, installationTypes, finishes, frameTypes, glassTypes } = facets;
 
-  // Pagination
   const totalPages = Math.max(1, Math.ceil(allResults.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
@@ -74,7 +73,6 @@ export function CatalogContent() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Active filter helpers
   const removeArrayFilter = (key: ArrayFilterKey, value: string) => {
     const current = filters[key] || [];
     handleFilterChange({ ...filters, [key]: current.filter((v) => v !== value) });
@@ -96,16 +94,16 @@ export function CatalogContent() {
   return (
     <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
       {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold tracking-tight text-text-primary">
+      <div className="mb-8">
+        <h1 className="text-display-lg text-text-primary">
           Product Catalog
         </h1>
         {filters.search && (
-          <p className="text-text-secondary mt-1">
+          <p className="text-text-secondary mt-2">
             Results for &ldquo;{filters.search}&rdquo;
             <button
               onClick={() => handleFilterChange({ ...filters, search: "" })}
-              className="text-navy-700 ml-2 hover:underline font-medium"
+              className="text-navy-700 ml-2 hover:underline font-semibold"
             >
               Clear search
             </button>
@@ -130,13 +128,13 @@ export function CatalogContent() {
         <div className="flex-1 min-w-0">
           {/* Active filter badges */}
           {activeFilters.length > 0 && (
-            <div className="flex items-center flex-wrap gap-2 mb-4">
-              <span className="text-sm text-text-secondary font-medium">Active filters:</span>
+            <div className="flex items-center flex-wrap gap-2 mb-5">
+              <span className="text-sm text-text-secondary font-medium">Active:</span>
               {activeFilters.map((f) => (
                 <Badge
                   key={`${f.key}-${f.value}`}
                   variant="secondary"
-                  className="cursor-pointer inline-flex items-center gap-1 pr-1.5"
+                  className="cursor-pointer inline-flex items-center gap-1 pr-1.5 hover:bg-gray-200 transition-colors"
                   onClick={() => {
                     if (f.key === "adaOnly") {
                       handleFilterChange({ ...filters, adaOnly: undefined });
@@ -153,7 +151,7 @@ export function CatalogContent() {
               ))}
               <button
                 onClick={clearAllFilters}
-                className="text-sm text-navy hover:text-amber-dark font-medium hover:underline"
+                className="text-sm text-navy hover:text-amber-dark font-semibold hover:underline transition-colors"
               >
                 Clear all
               </button>
@@ -161,11 +159,10 @@ export function CatalogContent() {
           )}
 
           {/* Toolbar */}
-          <div className="flex items-center justify-between mb-5 gap-4 bg-white rounded-xl px-4 py-3 shadow-card border border-border-subtle">
+          <div className="flex items-center justify-between mb-6 gap-4 bg-white rounded-xl px-4 py-3 shadow-card border border-border-subtle">
             <p className="text-sm text-text-secondary">
-              Showing{" "}
               <span className="font-semibold text-text-primary">
-                {allResults.length > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + PAGE_SIZE, allResults.length)}
+                {allResults.length > 0 ? startIndex + 1 : 0}&ndash;{Math.min(startIndex + PAGE_SIZE, allResults.length)}
               </span>{" "}
               of{" "}
               <span className="font-semibold text-text-primary">
@@ -225,8 +222,8 @@ export function CatalogContent() {
               <div
                 className={cn(
                   view === "grid"
-                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5"
-                    : "flex flex-col gap-3"
+                    ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 stagger-children"
+                    : "flex flex-col gap-3 stagger-children"
                 )}
               >
                 {paginatedResults.map((product) => (
@@ -240,12 +237,13 @@ export function CatalogContent() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-2 mt-10">
+                <div className="flex items-center justify-center gap-2 mt-12">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => goToPage(1)}
                     disabled={currentPage === 1}
+                    className="rounded-lg"
                   >
                     <ChevronsLeft className="w-4 h-4" />
                   </Button>
@@ -254,18 +252,20 @@ export function CatalogContent() {
                     size="sm"
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
+                    className="rounded-lg"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span className="text-sm text-text-secondary px-4">
-                    Page <span className="font-semibold text-text-primary">{currentPage}</span> of{" "}
-                    <span className="font-semibold text-text-primary">{totalPages}</span>
+                  <span className="text-sm text-text-secondary px-4 font-medium">
+                    Page <span className="font-bold text-text-primary">{currentPage}</span> of{" "}
+                    <span className="font-bold text-text-primary">{totalPages}</span>
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
+                    className="rounded-lg"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
@@ -274,6 +274,7 @@ export function CatalogContent() {
                     size="sm"
                     onClick={() => goToPage(totalPages)}
                     disabled={currentPage === totalPages}
+                    className="rounded-lg"
                   >
                     <ChevronsRight className="w-4 h-4" />
                   </Button>
@@ -281,19 +282,22 @@ export function CatalogContent() {
               )}
             </>
           ) : (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-card border border-border-subtle">
-              <Search className="w-12 h-12 text-text-tertiary mx-auto mb-4" />
-              <p className="text-text-primary text-lg font-semibold mb-2">
+            <div className="text-center py-24 bg-white rounded-2xl shadow-card border border-border-subtle">
+              <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-5">
+                <Package className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-text-primary text-lg font-display font-bold mb-2">
                 No products found
               </p>
-              <p className="text-text-secondary text-sm mb-6">
-                Try adjusting your filters or search terms
+              <p className="text-text-secondary text-sm mb-6 max-w-sm mx-auto">
+                Try adjusting your filters or search terms to find what you&apos;re looking for
               </p>
               <Button
                 variant="outline"
                 onClick={() =>
                   handleFilterChange({ search: "", sort: "default" })
                 }
+                className="rounded-xl"
               >
                 Clear all filters
               </Button>

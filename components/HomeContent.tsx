@@ -20,16 +20,17 @@ import { ProductCard } from "./ProductCard";
 import { getCatalogProducts } from "@/lib/products";
 import { BRANDS, BRAND_NAMES } from "@/lib/brands";
 import { CHANNEL, getChannelResourceUrl } from "@/lib/channel";
+import { cn } from "@/lib/utils";
 
 /* ------------------------------------------------------------------ */
 /*  Category config                                                    */
 /* ------------------------------------------------------------------ */
 const CATEGORIES = [
-  { name: "Bathtubs", icon: Bath, gradient: "from-blue-500 to-blue-700" },
+  { name: "Bathtubs", icon: Bath, gradient: "from-blue-600 to-blue-800" },
   { name: "Shower Doors", icon: DoorOpen, gradient: "from-navy to-navy-light" },
-  { name: "Shower Bases", icon: Square, gradient: "from-amber-500 to-amber-600" },
-  { name: "Shower Doors & Enclosures", icon: Layers, gradient: "from-emerald-500 to-emerald-700" },
-  { name: "Wall Systems", icon: LayoutGrid, gradient: "from-purple-500 to-purple-700" },
+  { name: "Shower Bases", icon: Square, gradient: "from-amber-500 to-amber-700" },
+  { name: "Shower Doors & Enclosures", icon: Layers, gradient: "from-emerald-600 to-emerald-800" },
+  { name: "Wall Systems", icon: LayoutGrid, gradient: "from-violet-600 to-violet-800" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -37,22 +38,22 @@ const CATEGORIES = [
 /* ------------------------------------------------------------------ */
 export function HomeContent() {
 
-  const catalogProducts = getCatalogProducts(); // Parents + standalones
+  const catalogProducts = getCatalogProducts();
   const featured = catalogProducts
     .filter((p) => p.images.length > 0 && (p.pricing.basePrice || p.pricing.listPrice))
     .slice(0, 8);
 
-  // Brand product counts (based on catalog products — parents + standalones)
   const brandCounts = new Map<string, number>();
   catalogProducts.forEach((p) => {
     brandCounts.set(p.brand, (brandCounts.get(p.brand) || 0) + 1);
   });
 
-  // Category product counts (based on catalog products)
   const categoryCounts = new Map<string, number>();
   catalogProducts.forEach((p) => {
     if (p.category) categoryCounts.set(p.category, (categoryCounts.get(p.category) || 0) + 1);
   });
+
+  const accentColor = CHANNEL.accentColor || "#f59e0b";
 
   return (
     <div>
@@ -62,11 +63,11 @@ export function HomeContent() {
       <HeroCarousel />
 
       {/* ============================================================ */}
-      {/*  BRAND LOGO BAR                                              */}
+      {/*  BRAND LOGO BAR — frosted glass with warm bg                 */}
       {/* ============================================================ */}
-      <section className="bg-white border-b border-gray-100">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6">
-          <div className="flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+      <section className="bg-white border-b border-gray-100 relative overflow-hidden">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5">
+          <div className="flex items-center justify-center gap-8 md:gap-12 flex-wrap">
             {BRAND_NAMES.map((name) => {
               const brand = BRANDS[name];
               if (!brand || !brand.logo) return null;
@@ -74,7 +75,7 @@ export function HomeContent() {
                 <Link
                   key={name}
                   href={`/brands/${brand.slug}`}
-                  className="opacity-60 hover:opacity-100 transition-opacity shrink-0"
+                  className="opacity-40 hover:opacity-100 transition-all duration-300 shrink-0 hover:scale-105"
                   title={name}
                 >
                   <Image
@@ -82,7 +83,7 @@ export function HomeContent() {
                     alt={name}
                     width={80}
                     height={40}
-                    className="h-8 md:h-10 w-auto object-contain"
+                    className="h-7 md:h-9 w-auto object-contain grayscale hover:grayscale-0 transition-all duration-300"
                     unoptimized
                   />
                 </Link>
@@ -93,39 +94,56 @@ export function HomeContent() {
       </section>
 
       {/* ============================================================ */}
-      {/*  SHOP BY CATEGORY                                            */}
+      {/*  SHOP BY CATEGORY — Bento grid with varied sizes             */}
       {/* ============================================================ */}
-      <section className="py-16 bg-surface-sunken">
+      <section className="py-20 bg-surface-sunken relative">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+          <div className="mb-12">
+            <p className="text-label mb-3" style={{ color: accentColor }}>Browse catalog</p>
+            <h2 className="text-display-lg text-gray-900">
               Shop by Category
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              Browse our full catalog organized by product type
-            </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {CATEGORIES.map(({ name, icon: Icon, gradient }) => {
+          {/* Bento grid: first 2 items span tall, remaining are compact */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 stagger-children">
+            {CATEGORIES.map(({ name, icon: Icon, gradient }, idx) => {
               const count = categoryCounts.get(name) || 0;
+              // First two items span 2 cols, first one also spans 2 rows on lg
+              const spanClass = idx === 0
+                ? "col-span-2 row-span-2"
+                : idx === 1
+                  ? "col-span-2"
+                  : "col-span-1 md:col-span-2 lg:col-span-2";
               return (
                 <Link
                   key={name}
                   href={`/products?category=${encodeURIComponent(name)}`}
-                  className="group relative rounded-2xl overflow-hidden bg-white border border-gray-200 hover:border-transparent hover:shadow-xl transition-all"
+                  className={cn(
+                    "group relative rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-elevated",
+                    spanClass
+                  )}
                 >
-                  <div className={`bg-gradient-to-br ${gradient} p-6 md:p-8 flex flex-col items-center text-center`}>
-                    <div className="w-14 h-14 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <Icon className="w-7 h-7 text-white" />
+                  <div className={`bg-gradient-to-br ${gradient} p-6 md:p-8 flex flex-col ${idx === 0 ? "h-full justify-end" : "items-start"} relative`}>
+                    {/* Decorative geometric accent */}
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+                    <div className="relative z-10">
+                      <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center mb-4 group-hover:scale-110 group-hover:bg-white/25 transition-all duration-300">
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <h3 className="font-display font-bold text-white text-base md:text-lg leading-tight">
+                        {name}
+                      </h3>
+                      {count > 0 && (
+                        <p className="text-xs text-white/50 mt-2 font-medium">
+                          {count} products
+                        </p>
+                      )}
                     </div>
-                    <h3 className="font-semibold text-white text-sm md:text-base leading-tight">
-                      {name}
-                    </h3>
-                    {count > 0 && (
-                      <p className="text-xs text-white/60 mt-2">
-                        {count} products
-                      </p>
-                    )}
+
+                    {/* Hover gradient wash */}
+                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-300" />
                   </div>
                 </Link>
               );
@@ -135,19 +153,26 @@ export function HomeContent() {
       </section>
 
       {/* ============================================================ */}
-      {/*  SHOP BY BRAND                                               */}
+      {/*  SHOP BY BRAND — asymmetric grid                             */}
       {/* ============================================================ */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white relative">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
-              Shop by Brand
-            </h2>
-            <p className="text-gray-500">
-              Trusted manufacturers in the bath industry
-            </p>
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <p className="text-label mb-3" style={{ color: accentColor }}>Our manufacturers</p>
+              <h2 className="text-display-lg text-gray-900">
+                Shop by Brand
+              </h2>
+            </div>
+            <Link
+              href="/brands"
+              className="hidden md:flex items-center gap-2 text-sm font-semibold text-navy hover:text-amber-dark transition-colors"
+            >
+              View All Brands
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 stagger-children">
             {BRAND_NAMES.map((name) => {
               const brand = BRANDS[name];
               if (!brand) return null;
@@ -156,10 +181,10 @@ export function HomeContent() {
                 <Link
                   key={name}
                   href={`/brands/${brand.slug}`}
-                  className="group flex flex-col items-center p-6 rounded-xl border border-gray-200 hover:border-navy/30 hover:shadow-lg transition-all bg-white"
+                  className="group flex flex-col items-center p-6 rounded-2xl border border-gray-200 hover:border-transparent hover:shadow-elevated transition-all duration-300 bg-white card-accent-top relative"
                 >
                   {brand.logo ? (
-                    <div className="w-16 h-16 mb-3 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div className="w-16 h-16 mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <Image
                         src={brand.logo}
                         alt={name}
@@ -171,13 +196,13 @@ export function HomeContent() {
                     </div>
                   ) : (
                     <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 group-hover:scale-110 transition-transform"
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl mb-4 group-hover:scale-110 transition-transform duration-300"
                       style={{ backgroundColor: brand.color }}
                     >
                       {name[0]}
                     </div>
                   )}
-                  <span className="text-sm font-medium text-gray-700 group-hover:text-navy transition-colors">
+                  <span className="text-sm font-semibold text-gray-700 group-hover:text-navy transition-colors font-display">
                     {name}
                   </span>
                   {count > 0 && (
@@ -196,26 +221,24 @@ export function HomeContent() {
       {/*  FEATURED PRODUCTS                                           */}
       {/* ============================================================ */}
       {featured.length > 0 && (
-        <section className="py-16 bg-surface-sunken">
+        <section className="py-20 bg-surface-sunken relative">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-end justify-between mb-10">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <p className="text-label mb-3" style={{ color: accentColor }}>Popular items</p>
+                <h2 className="text-display-lg text-gray-900">
                   Featured Products
                 </h2>
-                <p className="text-gray-500 text-sm mt-1">
-                  Popular items from our catalog
-                </p>
               </div>
               <Link
                 href="/products"
-                className="text-navy font-medium text-sm hover:text-amber-dark transition-colors flex items-center gap-1"
+                className="text-navy font-semibold text-sm hover:text-amber-dark transition-colors flex items-center gap-1.5"
               >
                 View All
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 stagger-children">
               {featured.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -225,40 +248,49 @@ export function HomeContent() {
       )}
 
       {/* ============================================================ */}
-      {/*  FEATURES ROW                                                */}
+      {/*  FEATURES ROW — editorial bento layout                      */}
       {/* ============================================================ */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white relative overflow-hidden">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="text-center mb-14">
+            <p className="text-label mb-3" style={{ color: accentColor }}>Why ABG Pro</p>
+            <h2 className="text-display-lg text-gray-900">
+              Built for Sales Pros
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6 stagger-children">
             {[
               {
                 icon: Search,
                 title: "Instant Search",
                 description:
                   "Find any product by name, SKU, brand, or description in milliseconds.",
+                accentGradient: "from-blue-500 to-cyan-500",
               },
               {
                 icon: ShoppingCart,
                 title: "Quick Quote Builder",
                 description:
                   "Add products to your quote with one click. Submit directly to the ABG team.",
+                accentGradient: "from-amber-500 to-orange-500",
               },
               {
                 icon: MessageCircle,
                 title: "AI Sales Assistant",
                 description:
                   "Get product recommendations and answer customer questions with AI-powered chat.",
+                accentGradient: "from-violet-500 to-purple-500",
               },
-            ].map(({ icon: Icon, title, description }) => (
+            ].map(({ icon: Icon, title, description, accentGradient }) => (
               <div
                 key={title}
-                className="text-center p-6 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="group relative p-8 rounded-2xl bg-gray-50 hover:bg-white hover:shadow-elevated transition-all duration-300 border border-transparent hover:border-gray-200"
               >
-                <div className="w-12 h-12 bg-navy/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Icon className="w-6 h-6 text-navy" />
+                <div className={`w-12 h-12 bg-gradient-to-br ${accentGradient} rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
-                <p className="text-sm text-gray-500">{description}</p>
+                <h3 className="font-display font-bold text-gray-900 text-lg mb-2">{title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
               </div>
             ))}
           </div>
@@ -268,17 +300,15 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  QUICK RESOURCES                                             */}
       {/* ============================================================ */}
-      <section className="py-16 bg-surface-sunken">
+      <section className="py-20 bg-surface-sunken">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">
+          <div className="mb-12">
+            <p className="text-label mb-3" style={{ color: accentColor }}>Documentation</p>
+            <h2 className="text-display-lg text-gray-900">
               Pro Resources
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto">
-              Quick access to brand resources, training, and documentation
-            </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 stagger-children">
             {BRAND_NAMES
               .map((name) => {
                 const brand = BRANDS[name];
@@ -310,10 +340,10 @@ export function HomeContent() {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-start gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:border-navy/30 hover:shadow-lg transition-all"
+                  className="group flex items-start gap-3 p-5 bg-white rounded-2xl border border-gray-200 hover:border-transparent hover:shadow-elevated transition-all duration-300"
                 >
                   {brandInfo?.logo ? (
-                    <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center shrink-0 p-1">
+                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center shrink-0 p-1 group-hover:bg-gray-100 transition-colors">
                       <Image
                         src={brandInfo.logo}
                         alt={brand}
@@ -325,24 +355,24 @@ export function HomeContent() {
                     </div>
                   ) : (
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
-                      style={{ backgroundColor: brandInfo?.color || "#1a2744" }}
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0"
+                      style={{ backgroundColor: brandInfo?.color || "#152847" }}
                     >
                       {brand[0]}
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm group-hover:text-navy transition-colors">
+                    <p className="font-display font-bold text-gray-900 text-sm group-hover:text-navy transition-colors">
                       {brand}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">{desc}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{desc}</p>
                   </div>
                 </a>
               );
             })}
             <Link
               href="/resources"
-              className="flex items-center justify-center gap-2 p-4 bg-navy/5 rounded-xl border border-navy/10 hover:bg-navy/10 transition-colors text-navy font-semibold text-sm"
+              className="flex items-center justify-center gap-2 p-5 bg-navy/5 rounded-2xl border border-navy/10 hover:bg-navy/10 transition-all duration-300 text-navy font-semibold text-sm font-display"
             >
               View All Resources
               <ArrowRight className="w-4 h-4" />
@@ -352,37 +382,48 @@ export function HomeContent() {
       </section>
 
       {/* ============================================================ */}
-      {/*  CTA                                                         */}
+      {/*  CTA — dramatic with gradient                                */}
       {/* ============================================================ */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="bg-navy rounded-3xl p-8 md:p-12 text-center text-white">
-            <Shield className="w-12 h-12 text-amber mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-3">Ready to Build a Quote?</h2>
-            <p className="text-white/60 mb-8 max-w-lg mx-auto">
-              Add products to your cart and submit a quote request. Our team
-              responds within one business day.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/products">
-                <Button variant="amber" size="lg">
-                  Start Browsing
-                  <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/resources">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-white/30 text-white hover:bg-white/10"
-                >
-                  Pro Resources
-                </Button>
-              </Link>
+          <div className="gradient-hero rounded-3xl p-10 md:p-16 text-center text-white relative overflow-hidden texture-noise">
+            <div className="relative z-10">
+              <div
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: accentColor + "25" }}
+              >
+                <Shield className="w-8 h-8" style={{ color: accentColor }} />
+              </div>
+              <h2 className="text-display-lg text-white mb-4">Ready to Build a Quote?</h2>
+              <p className="text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
+                Add products to your cart and submit a quote request. Our team
+                responds within one business day.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link href="/products">
+                  <Button variant="amber" size="lg" className="shadow-lg hover:shadow-xl transition-shadow">
+                    Start Browsing
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link href="/resources">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="border-white/20 text-white hover:bg-white/10 hover:border-white/30"
+                  >
+                    Pro Resources
+                  </Button>
+                </Link>
+              </div>
             </div>
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/3 rounded-full -translate-y-1/3 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/3 rounded-full translate-y-1/3 -translate-x-1/3" />
           </div>
         </div>
       </section>
     </div>
   );
 }
+
