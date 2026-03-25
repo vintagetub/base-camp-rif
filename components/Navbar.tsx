@@ -138,7 +138,7 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-50 transition-all duration-500 ease-out",
           scrolled
-            ? "bg-white dark:bg-navy-900 shadow-elevated border-b border-gray-200 dark:border-navy-700"
+            ? "bg-navy-950 shadow-elevated border-b border-navy-800"
             : "bg-navy"
         )}
       >
@@ -164,19 +164,13 @@ export function Navbar() {
                 src="https://res.cloudinary.com/american-bath-group/image/upload/v1648488050/abg-graphics/logos/abg/abg-logos/svg/abg-logo-horizontal.svg"
                 alt="American Bath Group"
                 className={cn(
-                  "transition-all duration-500",
-                  scrolled ? "h-6" : "h-8",
-                  scrolled ? "" : "brightness-0 invert"
+                  "transition-all duration-500 brightness-0 invert",
+                  scrolled ? "h-6" : "h-8"
                 )}
               />
               <span
-                className={cn(
-                  "hidden sm:inline text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md transition-all",
-                  scrolled
-                    ? "text-navy-700 bg-navy-50 dark:text-amber dark:bg-amber/10"
-                    : "text-amber-light bg-white/10"
-                )}
-                style={accentColor && !scrolled ? { backgroundColor: accentColor + "30", color: accentColor } : undefined}
+                className="hidden sm:inline text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md transition-all text-amber-light bg-white/10"
+                style={accentColor ? { backgroundColor: accentColor + "30", color: accentColor } : undefined}
               >
                 {CHANNEL.id !== "all" ? `${CHANNEL.name.toUpperCase()} PRO` : "PRO SALES"}
               </span>
@@ -192,13 +186,9 @@ export function Navbar() {
                     href={link.href}
                     className={cn(
                       "relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
-                      scrolled
-                        ? isActive
-                          ? "text-navy bg-navy/8 dark:text-white dark:bg-white/10"
-                          : "text-gray-700 hover:text-navy hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
-                        : isActive
-                          ? "text-white bg-white/15"
-                          : "text-white/75 hover:bg-white/10 hover:text-white"
+                      isActive
+                        ? "text-white bg-white/15"
+                        : "text-white/75 hover:bg-white/10 hover:text-white"
                     )}
                   >
                     {link.label}
@@ -218,23 +208,11 @@ export function Navbar() {
               {/* Search button */}
               <button
                 onClick={() => setSearchOpen(true)}
-                className={cn(
-                  "p-2 rounded-lg transition-all flex items-center gap-2",
-                  scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
-                    : "hover:bg-white/10 text-white/80"
-                )}
+                className="p-2 rounded-lg transition-all flex items-center gap-2 hover:bg-white/10 text-white/80"
                 aria-label="Search"
               >
                 <Search className="w-5 h-5" />
-                <kbd
-                  className={cn(
-                    "hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono",
-                    scrolled
-                      ? "bg-gray-200 text-gray-500 dark:bg-white/10 dark:text-gray-500"
-                      : "bg-white/10 text-white/40"
-                  )}
-                >
+                <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono bg-white/10 text-white/40">
                   /
                 </kbd>
               </button>
@@ -245,12 +223,7 @@ export function Navbar() {
               {/* Cart button */}
               <button
                 onClick={toggleDrawer}
-                className={cn(
-                  "relative p-2 rounded-lg transition-all",
-                  scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
-                    : "hover:bg-white/10 text-white/80"
-                )}
+                className="relative p-2 rounded-lg transition-all hover:bg-white/10 text-white/80"
                 aria-label="Open quote cart"
               >
                 <ShoppingCart className="w-5 h-5" />
@@ -270,12 +243,7 @@ export function Navbar() {
               {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={cn(
-                  "p-2 rounded-lg transition-colors md:hidden",
-                  scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300"
-                    : "hover:bg-white/10 text-white/80"
-                )}
+                className="p-2 rounded-lg transition-colors md:hidden hover:bg-white/10 text-white/80"
                 aria-label="Menu"
               >
                 {mobileMenuOpen ? (
@@ -295,14 +263,7 @@ export function Navbar() {
             mobileMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
           )}
         >
-          <nav
-            className={cn(
-              "px-4 py-3 space-y-1 border-t",
-              scrolled
-                ? "border-gray-200 bg-white dark:bg-navy-900 dark:border-white/10"
-                : "border-white/10 bg-navy-dark"
-            )}
-          >
+          <nav className="px-4 py-3 space-y-1 border-t border-white/10 bg-navy-dark">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -310,13 +271,9 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
                   "block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                  scrolled
-                    ? pathname === link.href
-                      ? "bg-navy-50 text-navy-800 dark:bg-white/10 dark:text-white"
-                      : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/10"
-                    : pathname === link.href
-                      ? "bg-white/15 text-white"
-                      : "text-white/80 hover:bg-white/10"
+                  pathname === link.href
+                    ? "bg-white/15 text-white"
+                    : "text-white/80 hover:bg-white/10"
                 )}
               >
                 {link.label}
