@@ -190,7 +190,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
                 {formatPrice(price)}
               </p>
             ) : (
-              <p className="text-sm font-medium text-amber-dark">
+              <p className="text-sm font-semibold text-navy">
                 Request Quote
               </p>
             )}
@@ -339,7 +339,7 @@ export function ProductCard({ product, view = "grid" }: ProductCardProps) {
                 )}
             </div>
           ) : (
-            <p className="text-sm font-medium text-amber-dark">
+            <p className="text-sm font-semibold text-navy">
               Request Quote
             </p>
           )}

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ShoppingCart, Menu, X, Search } from "lucide-react";
-import { ThemeToggle } from "./ThemeProvider";
 import { useQuoteStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { getAllProducts, type Product } from "@/lib/products";
@@ -138,7 +137,7 @@ export function Navbar() {
         className={cn(
           "sticky top-0 z-50 transition-all duration-500 ease-out",
           scrolled
-            ? "bg-white dark:bg-navy-900 shadow-elevated border-b border-gray-200 dark:border-navy-700"
+            ? "bg-white shadow-elevated border-b border-gray-200"
             : "bg-navy"
         )}
       >
@@ -173,7 +172,7 @@ export function Navbar() {
                 className={cn(
                   "hidden sm:inline text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-md transition-all",
                   scrolled
-                    ? "text-navy-700 bg-navy-50 dark:text-amber dark:bg-amber/10"
+                    ? "text-navy-700 bg-navy-50"
                     : "text-amber-light bg-white/10"
                 )}
                 style={accentColor && !scrolled ? { backgroundColor: accentColor + "30", color: accentColor } : undefined}
@@ -194,8 +193,8 @@ export function Navbar() {
                       "relative px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200",
                       scrolled
                         ? isActive
-                          ? "text-navy bg-navy/8 dark:text-white dark:bg-white/10"
-                          : "text-gray-700 hover:text-navy hover:bg-gray-100 dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/10"
+                          ? "text-navy bg-navy/8"
+                          : "text-gray-700 hover:text-navy hover:bg-gray-100"
                         : isActive
                           ? "text-white bg-white/15"
                           : "text-white/75 hover:bg-white/10 hover:text-white"
@@ -221,7 +220,7 @@ export function Navbar() {
                 className={cn(
                   "p-2 rounded-lg transition-all flex items-center gap-2",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
+                    ? "hover:bg-gray-100 text-gray-700"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Search"
@@ -231,7 +230,7 @@ export function Navbar() {
                   className={cn(
                     "hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-mono",
                     scrolled
-                      ? "bg-gray-200 text-gray-500 dark:bg-white/10 dark:text-gray-500"
+                      ? "bg-gray-200 text-gray-500"
                       : "bg-white/10 text-white/40"
                   )}
                 >
@@ -239,16 +238,13 @@ export function Navbar() {
                 </kbd>
               </button>
 
-              {/* Theme toggle */}
-              <ThemeToggle />
-
               {/* Cart button */}
               <button
                 onClick={toggleDrawer}
                 className={cn(
                   "relative p-2 rounded-lg transition-all",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-white/10"
+                    ? "hover:bg-gray-100 text-gray-700"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Open quote cart"
@@ -273,7 +269,7 @@ export function Navbar() {
                 className={cn(
                   "p-2 rounded-lg transition-colors md:hidden",
                   scrolled
-                    ? "hover:bg-gray-100 text-gray-700 dark:text-gray-300"
+                    ? "hover:bg-gray-100 text-gray-700"
                     : "hover:bg-white/10 text-white/80"
                 )}
                 aria-label="Menu"
@@ -299,7 +295,7 @@ export function Navbar() {
             className={cn(
               "px-4 py-3 space-y-1 border-t",
               scrolled
-                ? "border-gray-200 bg-white dark:bg-navy-900 dark:border-white/10"
+                ? "border-gray-200 bg-white"
                 : "border-white/10 bg-navy-dark"
             )}
           >
@@ -312,8 +308,8 @@ export function Navbar() {
                   "block px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
                   scrolled
                     ? pathname === link.href
-                      ? "bg-navy-50 text-navy-800 dark:bg-white/10 dark:text-white"
-                      : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-white/10"
+                      ? "bg-navy-50 text-navy-800"
+                      : "text-gray-600 hover:bg-gray-50"
                     : pathname === link.href
                       ? "bg-white/15 text-white"
                       : "text-white/80 hover:bg-white/10"
@@ -339,9 +335,9 @@ export function Navbar() {
 
           {/* Search panel */}
           <div className="relative max-w-2xl mx-auto mt-[12vh] px-4">
-            <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-elevated overflow-hidden animate-scale-in border border-gray-200 dark:border-navy-700">
+            <div className="bg-white rounded-2xl shadow-elevated overflow-hidden animate-scale-in border border-gray-200">
               {/* Search input */}
-              <div className="flex items-center gap-3 px-5 border-b border-gray-200 dark:border-navy-700">
+              <div className="flex items-center gap-3 px-5 border-b border-gray-200">
                 <Search className="w-5 h-5 text-gray-400 shrink-0" />
                 <input
                   ref={searchInputRef}
@@ -353,7 +349,7 @@ export function Navbar() {
                   }}
                   onKeyDown={handleSearchKeyDown}
                   placeholder="Search products, SKUs, brands..."
-                  className="flex-1 py-4 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
+                  className="flex-1 py-4 text-base text-gray-900 placeholder:text-gray-400 bg-transparent focus:outline-none font-medium"
                 />
                 {query && (
                   <button
@@ -361,12 +357,12 @@ export function Navbar() {
                       setQuery("");
                       setResults([]);
                     }}
-                    className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     <X className="w-5 h-5" />
                   </button>
                 )}
-                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded-md bg-gray-100 dark:bg-navy-700 text-gray-400 text-xs font-mono">
+                <kbd className="hidden md:inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-gray-400 text-xs font-mono">
                   ESC
                 </kbd>
               </div>
@@ -379,13 +375,13 @@ export function Navbar() {
                       key={product.id}
                       onClick={() => navigateToProduct(product)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-gray-100 dark:border-navy-700 last:border-0",
+                        "w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-gray-100 last:border-0",
                         selectedIndex === i
-                          ? "bg-navy-50 dark:bg-navy-700"
-                          : "hover:bg-gray-50 dark:hover:bg-navy-700/50"
+                          ? "bg-navy-50"
+                          : "hover:bg-gray-50"
                       )}
                     >
-                      <div className="w-12 h-12 bg-gray-100 dark:bg-navy-700 rounded-lg overflow-hidden shrink-0">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                         {product.images[0] ? (
                           <Image
                             src={product.images[0]}
@@ -402,20 +398,20 @@ export function Navbar() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
                           {product.shortName || product.name}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-xs text-gray-500 truncate">
                           {product.brand} &middot; SKU: {product.sku}
                           {product.isParent && product.childVariantIds && product.childVariantIds.length > 0 && (
-                            <span className="ml-1 text-navy dark:text-amber font-medium">
+                            <span className="ml-1 text-navy font-medium">
                               &middot; {product.childVariantIds.length} variant{product.childVariantIds.length !== 1 ? "s" : ""}
                             </span>
                           )}
                         </p>
                       </div>
                       {price(product) && (
-                        <span className="text-sm font-bold text-navy dark:text-amber shrink-0">
+                        <span className="text-sm font-bold text-navy shrink-0">
                           {price(product)}
                         </span>
                       )}
@@ -428,7 +424,7 @@ export function Navbar() {
                         `/products?search=${encodeURIComponent(query.trim())}`
                       );
                     }}
-                    className="w-full px-5 py-3 text-sm text-center text-navy dark:text-amber font-semibold hover:bg-navy/5 dark:hover:bg-amber/5 transition-colors"
+                    className="w-full px-5 py-3 text-sm text-center text-navy font-semibold hover:bg-navy/5 transition-colors"
                   >
                     View all results for &ldquo;{query}&rdquo;
                   </button>
@@ -445,7 +441,7 @@ export function Navbar() {
                       closeSearch();
                       router.push(`/products`);
                     }}
-                    className="mt-2 text-sm text-navy dark:text-amber font-medium hover:underline"
+                    className="mt-2 text-sm text-navy font-medium hover:underline"
                   >
                     Browse all products
                   </button>
@@ -459,19 +455,19 @@ export function Navbar() {
                   </p>
                   <div className="flex items-center justify-center gap-4 mt-3 text-xs text-gray-400">
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 font-mono">
                         &uarr;&darr;
                       </kbd>
                       Navigate
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 font-mono">
                         Enter
                       </kbd>
                       Select
                     </span>
                     <span className="flex items-center gap-1">
-                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 dark:bg-navy-700 font-mono">
+                      <kbd className="px-1.5 py-0.5 rounded-md bg-gray-100 font-mono">
                         Esc
                       </kbd>
                       Close

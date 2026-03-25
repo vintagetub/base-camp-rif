@@ -395,7 +395,7 @@ export function HomeContent() {
                 <Shield className="w-8 h-8" style={{ color: accentColor }} />
               </div>
               <h2 className="text-display-lg text-white mb-4">Ready to Build a Quote?</h2>
-              <p className="text-white/50 mb-10 max-w-lg mx-auto leading-relaxed">
+              <p className="text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
                 Add products to your cart and submit a quote request. Our team
                 responds within one business day.
               </p>
@@ -408,9 +408,9 @@ export function HomeContent() {
                 </Link>
                 <Link href="/resources">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="lg"
-                    className="border-white/20 text-white hover:bg-white/10 hover:border-white/30"
+                    className="border border-white/30 text-white hover:bg-white/10 hover:border-white/40"
                   >
                     Pro Resources
                   </Button>

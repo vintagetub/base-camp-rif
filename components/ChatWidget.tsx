@@ -781,8 +781,8 @@ export function ChatWidget() {
       {/* Chat Panel */}
       <div
         className={cn(
-          "fixed z-50 bg-white dark:bg-navy-800 flex flex-col transition-all duration-300 origin-bottom-right",
-          "bottom-24 right-6 w-[440px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-chat border border-gray-200 dark:border-navy-700",
+          "fixed z-50 bg-white flex flex-col transition-all duration-300 origin-bottom-right",
+          "bottom-24 right-6 w-[440px] max-w-[calc(100vw-3rem)] rounded-2xl shadow-chat border border-gray-200",
           "max-[640px]:inset-0 max-[640px]:bottom-0 max-[640px]:right-0 max-[640px]:w-full max-[640px]:max-w-full max-[640px]:rounded-none max-[640px]:border-0",
           isOpen
             ? "opacity-100 scale-100 translate-y-0 pointer-events-auto"
@@ -883,7 +883,7 @@ export function ChatWidget() {
         )}
 
         {/* Input Area */}
-        <div className="p-3 border-t border-gray-200 dark:border-navy-700 shrink-0">
+        <div className="p-3 border-t border-gray-200 shrink-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -897,7 +897,7 @@ export function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about products, specs, UPCs, or quotes..."
-              className="flex-1 rounded-xl border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-700 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy dark:focus:ring-amber/30 dark:focus:border-amber/50 transition-colors dark:text-white dark:placeholder:text-gray-500"
+              className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-navy/30 focus:border-navy transition-colors"
               disabled={isLoading}
             />
             <button

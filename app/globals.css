@@ -67,83 +67,6 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Dark mode — cohesive true-dark navy, not purple                   */
-/* ------------------------------------------------------------------ */
-html.dark {
-  --color-surface: #111A2E;
-  --color-surface-raised: #162236;
-  --color-surface-sunken: #0B1220;
-  --color-text-primary: #ECF0F7;
-  --color-text-secondary: #94A0B8;
-  --color-text-tertiary: #5A6A82;
-  --color-border-subtle: #1E2D45;
-  --color-border-default: #2A3D5A;
-  --color-background: #111A2E;
-  --color-foreground: #ECF0F7;
-
-  --color-navy-950: #080E1A;
-  --color-navy-900: #0B1220;
-  --color-navy-800: #111A2E;
-  --color-navy-700: #1E2D45;
-  --color-navy-100: #2A3D5A;
-  --color-navy-50: #162236;
-
-  --color-gray-50: #111A2E;
-  --color-gray-100: #162236;
-  --color-gray-200: #1E2D45;
-  --color-gray-300: #2A3D5A;
-  --color-gray-400: #5A6A82;
-  --color-gray-500: #7A8A9E;
-  --color-gray-600: #94A0B8;
-  --color-gray-700: #B4BFD0;
-  --color-gray-800: #D6DEE8;
-  --color-gray-900: #ECF0F7;
-
-  --color-green-50: #0d2818;
-}
-
-html.dark body {
-  background: var(--color-surface-sunken);
-  color: var(--color-text-primary);
-}
-
-html.dark .bg-white {
-  background-color: var(--color-surface) !important;
-}
-
-html.dark .text-gray-900,
-html.dark .text-gray-800,
-html.dark .text-gray-700 {
-  color: var(--color-text-primary) !important;
-}
-
-html.dark .text-gray-600,
-html.dark .text-gray-500 {
-  color: var(--color-text-secondary) !important;
-}
-
-html.dark .text-gray-400,
-html.dark .text-gray-300 {
-  color: var(--color-text-tertiary) !important;
-}
-
-html.dark .border-gray-200,
-html.dark .border-gray-100 {
-  border-color: var(--color-border-subtle) !important;
-}
-
-html.dark .bg-gray-50,
-html.dark .bg-gray-100 {
-  background-color: var(--color-surface-raised) !important;
-}
-
-html.dark .shadow-card {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.4);
-}
-
-html.dark .shadow-card-hover {
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.3);
-}
 
 /* ------------------------------------------------------------------ */
 /*  Typography — Outfit for headings, Source Sans 3 for body          */
@@ -372,6 +295,3 @@ h1, h2, h3, h4 {
   -webkit-backdrop-filter: blur(16px);
 }
 
-html.dark .glass {
-  background: rgba(17, 26, 46, 0.85);
-}
