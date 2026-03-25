@@ -35,7 +35,7 @@ export const ALL_BRANDS: Record<string, BrandInfo> = {
     name: "Coastal Shower Doors",
     slug: "coastal-shower-doors",
     color: "#0077B6",
-    logo: "https://res.cloudinary.com/american-bath-group/image/upload/v1765900545/abg-graphics/logos/coastal-shower-doors/coastal-shower-doors-logo.jpg",
+    logo: "https://res.cloudinary.com/american-bath-group/image/upload/v1655908802/websites-product-info-and-content/abghospitality/content/about/who-we-are/abghospitality-trustedbrands-coastalshowerdoors.jpg",
     website: "https://coastalshowerdoors.com/",
     resourceUrl: "https://coastalshowerdoors.com/resources",
     description:
