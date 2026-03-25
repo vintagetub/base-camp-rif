@@ -952,11 +952,11 @@ export function ProductDetail({ product }: ProductDetailProps) {
             ref={(el) => { sectionRefs.current.compatible = el; }}
             id="tab-compatible"
           >
-            <h2 className="text-xl font-bold text-navy-800 dark:text-navy-100 mb-2 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-navy-800 mb-2 flex items-center gap-2">
               <Package className="w-5 h-5" />
               Compatible Products
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <p className="text-sm text-gray-500 mb-6">
               Products that fit and work with this item based on dimensions, series, and installation type.
             </p>
 
@@ -976,13 +976,13 @@ export function ProductDetail({ product }: ProductDetailProps) {
                 <Accordion.Item
                   key={group.category}
                   value={group.category}
-                  className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-card overflow-hidden"
+                  className="bg-white rounded-xl border border-gray-200 shadow-card overflow-hidden"
                 >
                   <Accordion.Header>
-                    <Accordion.Trigger className="flex items-center justify-between w-full px-5 py-4 text-sm font-semibold text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors group">
+                    <Accordion.Trigger className="flex items-center justify-between w-full px-5 py-4 text-sm font-semibold text-gray-800 hover:bg-gray-50 transition-colors group">
                       <span className="flex items-center gap-2">
                         {group.category}
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                           {group.totalCount}
                         </span>
                       </span>
@@ -1006,7 +1006,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                         ))}
                       </div>
                       {group.totalCount > MAX_PER_GROUP && (
-                        <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 text-center">
+                        <p className="text-xs text-gray-400 mt-3 text-center">
                           Showing {group.products.length} of {group.totalCount} — browse the catalog for more
                         </p>
                       )}

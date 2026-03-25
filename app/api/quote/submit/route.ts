@@ -62,7 +62,7 @@ Submitted via ABG Pro Sales Portal
           },
           body: JSON.stringify({
             from: "ABG Pro Sales <onboarding@resend.dev>",
-            to: [process.env.QUOTE_EMAIL_TO || "georgekvintage@gmail.com"],
+            to: [process.env.QUOTE_EMAIL_TO || "iamgeorgekelly@gmail.com"],
             subject: `Quote Request ${quoteRef} - ${repName} (Store #${storeNumber})`,
             text: emailBody,
             reply_to: email,
