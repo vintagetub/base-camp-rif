@@ -539,22 +539,12 @@ export function QuoteReview() {
                     placeholder="Special instructions..."
                   />
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="lg"
-                    className="flex-1"
-                    onClick={handleDownloadPDF}
-                  >
-                    <Download className="w-5 h-5" />
-                    Download PDF
-                  </Button>
+                <div className="space-y-2">
                   <Button
                     type="submit"
                     variant="amber"
                     size="lg"
-                    className="flex-1"
+                    className="w-full"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -565,6 +555,16 @@ export function QuoteReview() {
                         Submit Quote
                       </>
                     )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={handleDownloadPDF}
+                  >
+                    <Download className="w-5 h-5" />
+                    Download PDF
                   </Button>
                 </div>
               </form>
