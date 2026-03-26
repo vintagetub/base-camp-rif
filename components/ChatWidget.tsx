@@ -72,26 +72,37 @@ interface ComparisonTableData {
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const STORAGE_KEY = "abg-chat-messages";
+const STORAGE_KEY = "basecamp-rif-chat-messages";
+const SESSION_KEY = "basecamp-rif-session-id";
+
+function getSessionId(): string {
+  if (typeof window === "undefined") return "ssr";
+  let id = sessionStorage.getItem(SESSION_KEY);
+  if (!id) {
+    id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    sessionStorage.setItem(SESSION_KEY, id);
+  }
+  return id;
+}
 
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "Hi! I'm the ABG Pro Sales Assistant, powered by **Claude**. I can help you:\n\n• **Find products** from 2,400+ bath products across all ABG brands\n• **Look up items** by UPC, Home Depot ID, or part number\n• **Compare options** side by side with detailed specs\n• **Build quotes** for your customers\n\nWhat can I help you with today?",
+    "Hi! I'm your **Base Camp** product assistant, powered by **Claude**. I can help you:\n\n• **Search products** across 2,400+ bath products from top manufacturers\n• **Build complete bids** — tubs, doors, walls, bases, and fixtures that work together\n• **Compare options** side by side with detailed specs\n• **Create quotes** for your customers\n\nWhat project are you working on?",
   timestamp: Date.now(),
 };
 
 const QUICK_ACTIONS = [
   {
+    label: "Build a bid",
+    icon: FileText,
+    prompt: "I need to build a complete bathroom bid for a customer",
+  },
+  {
     label: "Find products",
     icon: Search,
     prompt: "Help me find a product for my customer",
-  },
-  {
-    label: "Build a quote",
-    icon: FileText,
-    prompt: "I need to build a quote for a bathroom remodel",
   },
   {
     label: "ADA options",
@@ -101,17 +112,17 @@ const QUICK_ACTIONS = [
   {
     label: "Compare products",
     icon: ArrowLeftRight,
-    prompt: "I want to compare bathtub options",
+    prompt: "I want to compare bathtub options across brands",
   },
   {
     label: "Look up UPC",
     icon: Barcode,
-    prompt: "I need to look up a product by UPC or Home Depot item number",
+    prompt: "I need to look up a product by UPC or item number",
   },
   {
     label: "Brand overview",
     icon: Package,
-    prompt: "Give me an overview of DreamLine's product lineup",
+    prompt: "Give me an overview of what brands you carry",
   },
 ];
 
@@ -697,7 +708,10 @@ export function ChatWidget() {
 
         const res = await fetch("/api/chat", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-session-id": getSessionId(),
+          },
           body: JSON.stringify({ messages: apiMessages, quoteItems }),
         });
 
@@ -798,7 +812,7 @@ export function ChatWidget() {
           </div>
           <div className="flex-1 min-w-0 relative z-10">
             <h3 className="font-display font-bold text-sm leading-tight">
-              ABG Pro Sales Assistant
+              Base Camp Assistant
             </h3>
             <p className="text-[11px] text-white/40">
               Powered by Claude

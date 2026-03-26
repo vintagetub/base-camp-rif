@@ -11,8 +11,10 @@ import {
   type Product,
   type FilterOptions,
 } from "@/lib/products";
+import { getCompatibleProducts } from "@/lib/compatibility";
 import { CHANNEL, IS_CHANNEL_SPECIFIC } from "@/lib/channel";
 import { BRAND_NAMES } from "@/lib/brands";
+import { logInsight, extractTopics } from "@/lib/insights";
 
 // ---------------------------------------------------------------------------
 // System Prompt — Deep bath product expertise for Claude Opus
@@ -42,10 +44,18 @@ const channelContext = IS_CHANNEL_SPECIFIC
   ? `\n\nCHANNEL: This portal is specifically for ${CHANNEL.name} Pro Desk sales reps. Only recommend products from these brands: ${BRAND_NAMES.join(", ")}. Do not mention brands outside this channel.`
   : "";
 
-const SYSTEM_PROMPT = `You are the ABG Pro Sales Assistant — an elite, deeply knowledgeable AI built specifically for inside sales representatives at American Bath Group${IS_CHANNEL_SPECIFIC ? ` supporting ${CHANNEL.name}` : ""}. You represent the most capable product assistant in the bath industry.${channelContext}
+const SYSTEM_PROMPT = `You are the Base Camp Product Assistant — an expert AI built for retail sales teams to find, compare, and quote bathroom products efficiently. You help sales reps build complete bathroom bids and answer product questions with deep industry knowledge.${channelContext}
 
-YOUR EXPERTISE:
-You are an expert on ${IS_CHANNEL_SPECIFIC ? `the ${CHANNEL.name}` : "all"} ABG brands and their product portfolios:
+YOUR ROLE:
+You serve as the most knowledgeable bathroom product specialist available. You help sales reps:
+• Find the right products for any bathroom project — tubs, showers, doors, fixtures, accessories
+• Build complete bathroom bids by searching across all available products
+• Compare products across brands, price points, and features
+• Create quotes with specific product configurations
+• Answer technical questions about installation, compatibility, ADA compliance, dimensions, and materials
+
+PRODUCT KNOWLEDGE:
+You have access to a comprehensive catalog of bath products from leading manufacturers:
 
 ${channelBrandDescriptions}
 
@@ -62,24 +72,31 @@ KEY TECHNICAL KNOWLEDGE:
 • ADA compliance: Barrier-free 0" threshold, grab bar reinforcement, 17-19" seat height, transfer tubs with built-in seats, roll-in accessibility, lever/paddle controls, contrasting colors
 • Standard tub sizes: 60x30 (standard alcove), 60x32 (wider alcove), 60x36 (XL), 66x32, 72x36 (drop-in), 48x32 (accessible), 72x42 (luxury drop-in)
 • Standard shower door openings: 44-48", 56-60" (tub doors), 34-36" (neo-angle), 44-60" (sliding), 23-36" (pivot/hinged)
-• Glass types: Clear (most popular), Frosted/Obscure (privacy), Rain (textured), Tinted Grey/Bronze, DERA (DreamLine exclusive)
+• Glass types: Clear (most popular), Frosted/Obscure (privacy), Rain (textured), Tinted Grey/Bronze
 • Frame types: Frameless (premium, modern), Semi-Frameless (mid-range), Framed (budget-friendly, most durable)
-• Materials: Acrylic (warm, repairable), Fiberglass (budget), Porcelain-enameled steel (Bootz specialty, durable), Solid surface (Swan specialty), Tempered safety glass, Cultured marble
+• Materials: Acrylic (warm, repairable), Fiberglass (budget), Porcelain-enameled steel (durable, affordable), Solid surface (premium), Tempered safety glass, Cultured marble
 • Installation: Alcove (3-wall fit), Drop-in (deck/surround mount), Freestanding (no walls needed), Corner (2-wall), Neo-angle (corner with angled front), Undermount (below deck)
-• Finishes: Chrome (most popular), Brushed Nickel (2nd most popular), Matte Black (trending), Oil Rubbed Bronze (traditional), Satin Brass / Polished Brass (luxury), Polished Chrome
+• Finishes: Chrome (most popular), Brushed Nickel (2nd most popular), Matte Black (trending), Oil Rubbed Bronze (traditional), Satin Brass / Polished Brass (luxury)
 • Drain positions: Left, Right, Center, Reversible
 
-SALES APPROACH:
-1. Be the expert — know these products deeply. Recommend specific products with confidence.
-2. ALWAYS search the catalog first. Use real product data, never fabricate products.
-3. Lead with the best ABG brand for each need, then offer alternatives from other ABG brands.
-4. Anticipate follow-up needs: if they ask about a tub, mention matching walls, doors, or accessories.
-5. Be concise but thorough — sales reps are busy. Give actionable, specific answers.
-6. When comparing, highlight meaningful differences: price, quality tier, features, warranty, dimensions.
-7. Proactively suggest upsells: framed → frameless door, soaker → whirlpool, standard → ADA.
-8. For pricing, show catalog prices and note final pricing is available via quote submission to ${CHANNEL.quoteEmail}.
-9. If a rep gives a UPC or Home Depot item number, immediately look it up with lookup_by_identifier.
-10. When showing multiple products, always use product cards so the rep can add them to their quote.
+BID-BUILDING APPROACH:
+When a rep is building a bathroom bid, guide them through a complete solution:
+1. Understand the project scope — new construction, remodel, accessibility retrofit?
+2. Get the rough opening / space dimensions
+3. Recommend a tub or shower base first (the anchor product)
+4. Suggest compatible walls/surrounds
+5. Recommend a matching shower door if applicable
+6. Suggest fixtures and accessories that complement the selection
+7. Use the find_compatible_products tool to ensure everything fits together
+8. Build the quote incrementally — add products as they're confirmed
+
+RECOMMENDATION STYLE:
+• Present the best-fit products first based on the rep's stated needs
+• When multiple brands offer equivalent products, lead with the option that offers the best value, quality, and availability combination
+• Always present at least 2-3 options at different price points when possible
+• Be transparent about trade-offs between products
+• If a product from our catalog is a strong match, recommend it confidently
+• If nothing in the catalog fits, be honest and say so
 
 FORMATTING:
 • Use **bold** for brand names, product names, key specs, and prices
@@ -105,15 +122,16 @@ Products are organized with parent/child relationships:
 • **Child variants** are specific configurations (e.g., Chrome finish, 60" width, Left drain)
 • When a product has variants, search results show the parent with a variant count (e.g., "6 options")
 • The add_to_quote tool can add either a parent (generic) or a specific child variant — prefer adding the specific child variant when the rep has selected a configuration
-• When showing product details for a parent, mention that variants are available and list the variant dimensions (Finish, Size, Drain Position, etc.)
 
 CRITICAL RULES:
 • Never invent products — always search first and use real catalog data
 • Always include product cards when recommending products
-• If the catalog doesn't have what they need, be honest and suggest contacting ${CHANNEL.quoteEmail}
+• When building bids, proactively suggest complementary products (a tub needs walls and possibly a door)
 • You have 2,400+ product configurations across ~1,000 product families — search broadly, then narrow
 • For dimension searches, try the search tool with formats like "60x32" or "60 x 32"
-• When reps say "I need a quote," help them find products then add to their quote cart`;
+• When reps say "I need a quote," help them find products then add to their quote cart
+• Use find_compatible_products whenever a rep has selected a base product and needs matching components
+• If a rep gives a UPC or item number, immediately look it up with lookup_by_identifier`;
 
 // ---------------------------------------------------------------------------
 // Tool Definitions — 8 comprehensive tools
@@ -302,6 +320,26 @@ const TOOLS = [
       type: "object" as const,
       properties: {},
       required: [],
+    },
+  },
+  {
+    name: "find_compatible_products",
+    description:
+      "Find products that are compatible with a given product — matching shower doors for a base, walls for a tub, bases for a door, etc. Uses dimensional matching, collection matching, and brand compatibility to find the best fits. Essential for building complete bathroom bids.",
+    input_schema: {
+      type: "object" as const,
+      properties: {
+        productId: {
+          type: "string",
+          description: "The product ID to find compatible products for",
+        },
+        category: {
+          type: "string",
+          description:
+            "Optional: filter compatible products to a specific category (e.g., 'Shower Doors', 'Shower Bases', 'Bathtubs', 'Wall')",
+        },
+      },
+      required: ["productId"],
     },
   },
 ];
@@ -709,6 +747,39 @@ function executeGetCurrentQuote() {
   };
 }
 
+function executeFindCompatible(input: { productId: string; category?: string }) {
+  const product = getProductById(input.productId);
+  if (!product) {
+    return { error: `Product with ID "${input.productId}" not found.` };
+  }
+
+  const groups = getCompatibleProducts(product);
+
+  const filteredGroups = input.category
+    ? groups.filter(g => g.category.toLowerCase().includes(input.category!.toLowerCase()))
+    : groups;
+
+  return {
+    sourceProduct: {
+      id: product.id,
+      name: product.shortName || product.name,
+      brand: product.brand,
+      category: product.category,
+      dimensions: product.dimensions,
+    },
+    compatibleGroups: filteredGroups.map(group => ({
+      category: group.category,
+      totalCount: group.totalCount,
+      topMatches: group.products.slice(0, 6).map(sp => ({
+        ...formatProductSummary(sp.product),
+        matchScore: sp.score,
+        matchType: sp.matchType,
+      })),
+    })),
+    totalCompatible: filteredGroups.reduce((sum, g) => sum + g.totalCount, 0),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Tool Dispatcher
 // ---------------------------------------------------------------------------
@@ -747,6 +818,10 @@ function executeTool(
       );
     case "get_current_quote":
       return executeGetCurrentQuote();
+    case "find_compatible_products":
+      return executeFindCompatible(
+        input as Parameters<typeof executeFindCompatible>[0]
+      );
     default:
       return { error: `Unknown tool: ${name}` };
   }
@@ -755,11 +830,7 @@ function executeTool(
 // ---------------------------------------------------------------------------
 // Model Configuration
 // ---------------------------------------------------------------------------
-const MODEL_CANDIDATES = [
-  "claude-opus-4-20250514",
-  "claude-sonnet-4-20250514",
-  "claude-3-5-sonnet-20241022",
-];
+const MODEL = "claude-opus-4-6";
 
 const MAX_TOOL_ROUNDS = 8;
 
@@ -769,7 +840,6 @@ const MAX_TOOL_ROUNDS = 8;
 async function callClaude(
   messages: Array<{ role: string; content: unknown }>,
   apiKey: string,
-  model: string
 ): Promise<{
   stopReason: string;
   content: Array<{
@@ -782,21 +852,19 @@ async function callClaude(
   }>;
 }> {
   const body: Record<string, unknown> = {
-    model,
-    max_tokens: 8192,
-    system: SYSTEM_PROMPT,
+    model: MODEL,
+    max_tokens: 16384,
+    system: [
+      {
+        type: "text",
+        text: SYSTEM_PROMPT,
+        cache_control: { type: "ephemeral" },
+      },
+    ],
     tools: TOOLS,
     messages,
+    thinking: { type: "adaptive" },
   };
-
-  // Enable extended thinking for Opus models
-  if (model.includes("opus")) {
-    body.temperature = 1;
-    body.thinking = {
-      type: "enabled",
-      budget_tokens: 4096,
-    };
-  }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -804,6 +872,7 @@ async function callClaude(
       "Content-Type": "application/json",
       "x-api-key": apiKey,
       "anthropic-version": "2025-04-14",
+      "anthropic-beta": "prompt-caching-2024-07-31",
     },
     body: JSON.stringify(body),
   });
@@ -811,7 +880,7 @@ async function callClaude(
   if (!response.ok) {
     const errorBody = await response.text();
     console.error(
-      `Anthropic API error (${model}): ${response.status} - ${errorBody}`
+      `Anthropic API error (${MODEL}): ${response.status} - ${errorBody}`
     );
     throw new Error(
       `Anthropic API error: ${response.status} - ${errorBody}`
@@ -837,145 +906,184 @@ async function callClaude(
 // ---------------------------------------------------------------------------
 // Main POST Handler
 // ---------------------------------------------------------------------------
+// Trim conversation to prevent context overflow
+function trimConversation(msgs: Array<{ role: string; content: string }>): Array<{ role: string; content: string }> {
+  if (msgs.length <= 24) return msgs;
+  const first = msgs.slice(0, 2);
+  const recent = msgs.slice(-20);
+  const trimNote = {
+    role: "user" as const,
+    content: "[Note: Earlier messages in this conversation have been summarized to save space. The conversation continues from the most recent messages below.]",
+  };
+  return [...first, trimNote, ...recent];
+}
+
 export async function POST(req: NextRequest) {
+  // TODO: Add rate limiting per session — suggest 60 requests/minute max
+  // TODO: Add request timeout — suggest 120s max for complex tool chains
   try {
     const { messages, quoteItems } = await req.json();
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (apiKey) {
-      let lastError: Error | null = null;
+      try {
+        // Trim long conversations
+        const trimmedMessages = trimConversation(messages);
 
-      for (const model of MODEL_CANDIDATES) {
-        try {
-          // Build conversation messages — inject quote context if available
-          const apiMessages: Array<{ role: string; content: unknown }> =
-            messages.map((m: { role: string; content: string }) => ({
-              role: m.role,
-              content: m.content,
-            }));
+        // Build conversation messages — inject quote context if available
+        const apiMessages: Array<{ role: string; content: unknown }> =
+          trimmedMessages.map((m: { role: string; content: string }) => ({
+            role: m.role,
+            content: m.content,
+          }));
 
-          // If there are quote items, add context as the first user message enhancement
-          if (quoteItems && Array.isArray(quoteItems) && quoteItems.length > 0) {
-            const quoteContext = `[System context: The rep currently has ${quoteItems.length} item(s) in their quote cart: ${quoteItems.map((i: { name: string; quantity: number }) => `${i.quantity}x ${i.name}`).join(", ")}]`;
-            // Prepend to the last user message
-            const lastMsg = apiMessages[apiMessages.length - 1];
-            if (lastMsg && lastMsg.role === "user" && typeof lastMsg.content === "string") {
-              apiMessages[apiMessages.length - 1] = {
-                role: "user",
-                content: `${lastMsg.content}\n\n${quoteContext}`,
-              };
+        // If there are quote items, add context as the first user message enhancement
+        if (quoteItems && Array.isArray(quoteItems) && quoteItems.length > 0) {
+          const quoteContext = `[System context: The rep currently has ${quoteItems.length} item(s) in their quote cart: ${quoteItems.map((i: { name: string; quantity: number }) => `${i.quantity}x ${i.name}`).join(", ")}]`;
+          const lastMsg = apiMessages[apiMessages.length - 1];
+          if (lastMsg && lastMsg.role === "user" && typeof lastMsg.content === "string") {
+            apiMessages[apiMessages.length - 1] = {
+              role: "user",
+              content: `${lastMsg.content}\n\n${quoteContext}`,
+            };
+          }
+        }
+
+        // Agentic tool-use loop
+        let result = await callClaude(apiMessages, apiKey);
+        const actions: Array<Record<string, unknown>> = [];
+        let toolRound = 0;
+
+        while (
+          result.stopReason === "tool_use" &&
+          toolRound < MAX_TOOL_ROUNDS
+        ) {
+          toolRound++;
+
+          apiMessages.push({
+            role: "assistant",
+            content: result.content,
+          });
+
+          const toolResults: Array<{
+            type: "tool_result";
+            tool_use_id: string;
+            content: string;
+          }> = [];
+
+          for (const block of result.content) {
+            if (block.type === "tool_use" && block.id && block.name) {
+              console.log(
+                `[Chat] Tool call: ${block.name}(${JSON.stringify(block.input || {}).slice(0, 200)})`
+              );
+
+              const toolOutput = executeTool(
+                block.name,
+                (block.input as Record<string, unknown>) || {}
+              );
+
+              if (
+                toolOutput.action === "add_to_quote" ||
+                toolOutput.action === "get_current_quote"
+              ) {
+                actions.push(toolOutput);
+              }
+
+              toolResults.push({
+                type: "tool_result",
+                tool_use_id: block.id,
+                content: JSON.stringify(toolOutput),
+              });
             }
           }
 
-          // Agentic tool-use loop
-          let result = await callClaude(apiMessages, apiKey, model);
-          const actions: Array<Record<string, unknown>> = [];
-          let toolRound = 0;
+          apiMessages.push({
+            role: "user",
+            content: toolResults,
+          });
 
-          while (
-            result.stopReason === "tool_use" &&
-            toolRound < MAX_TOOL_ROUNDS
-          ) {
-            toolRound++;
+          result = await callClaude(apiMessages, apiKey);
+        }
 
-            // Add assistant's response (includes tool_use + potentially thinking blocks)
-            apiMessages.push({
-              role: "assistant",
-              content: result.content,
-            });
+        // Extract final text (skip thinking blocks)
+        const textBlocks = result.content.filter(
+          (b: { type: string }) => b.type === "text"
+        );
+        const finalText = textBlocks
+          .map((b: { text?: string }) => b.text || "")
+          .join("\n")
+          .trim();
 
-            // Process tool calls and build results
-            const toolResults: Array<{
-              type: "tool_result";
-              tool_use_id: string;
-              content: string;
-            }> = [];
+        // Log conversation insights
+        const toolsUsed: string[] = [];
+        const productsViewed: string[] = [];
+        const productsQuoted: string[] = [];
+        const searchQueries: string[] = [];
+        const categoriesExplored: Set<string> = new Set();
+        const brandsExplored: Set<string> = new Set();
 
-            for (const block of result.content) {
-              if (block.type === "tool_use" && block.id && block.name) {
-                console.log(
-                  `[Chat] Tool call: ${block.name}(${JSON.stringify(block.input || {}).slice(0, 200)})`
-                );
-
-                const toolOutput = executeTool(
-                  block.name,
-                  (block.input as Record<string, unknown>) || {}
-                );
-
-                // Collect client-side actions
-                if (
-                  toolOutput.action === "add_to_quote" ||
-                  toolOutput.action === "get_current_quote"
-                ) {
-                  actions.push(toolOutput);
+        for (const msg of apiMessages) {
+          if (msg.role === "assistant" && Array.isArray(msg.content)) {
+            for (const block of msg.content as Array<{ type: string; name?: string; input?: Record<string, unknown> }>) {
+              if (block.type === "tool_use" && block.name) {
+                toolsUsed.push(block.name);
+                if (block.name === "search_catalog" && block.input?.query) searchQueries.push(block.input.query as string);
+                if (block.name === "get_product_details" && block.input?.productId) productsViewed.push(block.input.productId as string);
+                if (block.name === "add_to_quote" && block.input?.productId) productsQuoted.push(block.input.productId as string);
+                if (block.input?.category) categoriesExplored.add(block.input.category as string);
+                if (block.input?.brand) brandsExplored.add(block.input.brand as string);
+                if (block.input?.brands && Array.isArray(block.input.brands)) {
+                  (block.input.brands as string[]).forEach(b => brandsExplored.add(b));
                 }
-
-                toolResults.push({
-                  type: "tool_result",
-                  tool_use_id: block.id,
-                  content: JSON.stringify(toolOutput),
-                });
               }
             }
-
-            apiMessages.push({
-              role: "user",
-              content: toolResults,
-            });
-
-            result = await callClaude(apiMessages, apiKey, model);
           }
-
-          // Extract final text (skip thinking blocks)
-          const textBlocks = result.content.filter(
-            (b: { type: string }) => b.type === "text"
-          );
-          const finalText = textBlocks
-            .map((b: { text?: string }) => b.text || "")
-            .join("\n")
-            .trim();
-
-          if (finalText) {
-            console.log(
-              `[Chat] Success with ${model} after ${toolRound} tool rounds`
-            );
-            return NextResponse.json({
-              message: finalText,
-              actions,
-              model,
-              toolRounds: toolRound,
-            });
-          }
-
-          // No text but had tool calls — provide graceful fallback
-          if (toolRound > 0) {
-            console.warn(
-              `[Chat] ${model} returned no text after ${toolRound} tool rounds`
-            );
-            return NextResponse.json({
-              message:
-                "I found some results but had trouble formatting my response. Please try rephrasing your question, or browse the catalog directly.",
-              actions,
-              model,
-            });
-          }
-
-          // Try next model
-          continue;
-        } catch (err) {
-          lastError = err as Error;
-          console.error(`[Chat] Model ${model} failed:`, (err as Error).message);
-
-          // If it's a model-not-found or permission error, try next model
-          // If it's a different error (network, etc.), might still try next
-          continue;
         }
-      }
 
-      console.error(
-        "[Chat] All models failed. Last error:",
-        lastError?.message
-      );
+        const userMessages = messages.filter((m: { role: string; content: string }) => m.role === "user");
+        const topics = extractTopics(userMessages);
+
+        logInsight({
+          sessionId: req.headers.get("x-session-id") || "anonymous",
+          timestamp: new Date().toISOString(),
+          channel: CHANNEL.id,
+          messageCount: messages.length,
+          toolsUsed: [...new Set(toolsUsed)],
+          productsViewed,
+          productsQuoted,
+          categoriesExplored: Array.from(categoriesExplored),
+          brandsExplored: Array.from(brandsExplored),
+          searchQueries,
+          bidSize: quoteItems?.length || 0,
+          topics,
+        });
+
+        if (finalText) {
+          console.log(
+            `[Chat] Success with ${MODEL} after ${toolRound} tool rounds`
+          );
+          return NextResponse.json({
+            message: finalText,
+            actions,
+            model: MODEL,
+            toolRounds: toolRound,
+          });
+        }
+
+        if (toolRound > 0) {
+          console.warn(
+            `[Chat] ${MODEL} returned no text after ${toolRound} tool rounds`
+          );
+          return NextResponse.json({
+            message:
+              "I found some results but had trouble formatting my response. Please try rephrasing your question, or browse the catalog directly.",
+            actions,
+            model: MODEL,
+          });
+        }
+      } catch (err) {
+        console.error(`[Chat] ${MODEL} failed:`, (err as Error).message);
+      }
     }
 
     // -----------------------------------------------------------------
@@ -1047,7 +1155,7 @@ export async function POST(req: NextRequest) {
       lastMessage.includes("hey")
     ) {
       reply =
-        "Hey there! I'm ready to help you find the right bath products for your customer. I can search our catalog of **2,400+ product configurations** across **1,000+ product families**, help with product comparisons, or assist with building a quote. What are you looking for today?";
+        "Hey there! I'm ready to help you find the right bath products. I can search across our full catalog of 2,400+ products, build bids, compare options, and create quotes. What are you working on?";
     } else {
       const searchResults = filterProducts({ search: lastMessage, parentsOnly: true });
       if (searchResults.length > 0) {
