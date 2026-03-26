@@ -21,8 +21,7 @@ interface FilterSidebarProps {
   finishes: string[];
   frameTypes: string[];
   glassTypes: string[];
-  widths: { value: number; count: number }[];
-  depths: { value: number; count: number }[];
+  sizes: { label: string; count: number }[];
   filters: FilterOptions;
   onFilterChange: (filters: FilterOptions) => void;
   totalResults: number;
@@ -152,8 +151,7 @@ export function FilterSidebar({
   finishes,
   frameTypes,
   glassTypes,
-  widths,
-  depths,
+  sizes,
   filters,
   onFilterChange,
   totalResults,
@@ -179,16 +177,12 @@ export function FilterSidebar({
     onFilterChange({ ...filters, [key]: next });
   };
 
-  const toggleNumberFilter = (
-    key: "widths" | "depths",
-    value: number,
-    checked: boolean
-  ) => {
-    const current = filters[key] || [];
+  const toggleSizeFilter = (value: string, checked: boolean) => {
+    const current = filters.sizes || [];
     const next = checked
       ? [...current, value]
       : current.filter((v) => v !== value);
-    onFilterChange({ ...filters, [key]: next });
+    onFilterChange({ ...filters, sizes: next });
   };
 
   const activeFilterCount =
@@ -199,8 +193,7 @@ export function FilterSidebar({
     (filters.finishes?.length || 0) +
     (filters.frameTypes?.length || 0) +
     (filters.glassTypes?.length || 0) +
-    (filters.widths?.length || 0) +
-    (filters.depths?.length || 0) +
+    (filters.sizes?.length || 0) +
     (filters.hasImages ? 1 : 0) +
     (filters.adaOnly ? 1 : 0) +
     (filters.hasVideo ? 1 : 0);
@@ -317,35 +310,16 @@ export function FilterSidebar({
           </AccordionSection>
         )}
 
-        {/* Width */}
-        {widths.length > 0 && (
-          <AccordionSection value="width" title="Width (in.)" activeCount={filters.widths?.length || 0}>
-            {widths.map((w) => (
+        {/* Size (W x D) */}
+        {sizes.length > 0 && (
+          <AccordionSection value="size" title="Size (W x D)" activeCount={filters.sizes?.length || 0}>
+            {sizes.map((s) => (
               <CheckboxFilter
-                key={w.value}
-                label={`${w.value}"`}
-                count={w.count}
-                checked={filters.widths?.includes(w.value) || false}
-                onChange={(checked) =>
-                  toggleNumberFilter("widths", w.value, checked)
-                }
-              />
-            ))}
-          </AccordionSection>
-        )}
-
-        {/* Depth */}
-        {depths.length > 0 && (
-          <AccordionSection value="depth" title="Depth (in.)" activeCount={filters.depths?.length || 0}>
-            {depths.map((d) => (
-              <CheckboxFilter
-                key={d.value}
-                label={`${d.value}"`}
-                count={d.count}
-                checked={filters.depths?.includes(d.value) || false}
-                onChange={(checked) =>
-                  toggleNumberFilter("depths", d.value, checked)
-                }
+                key={s.label}
+                label={`${s.label}"`}
+                count={s.count}
+                checked={filters.sizes?.includes(s.label) || false}
+                onChange={(checked) => toggleSizeFilter(s.label, checked)}
               />
             ))}
           </AccordionSection>
