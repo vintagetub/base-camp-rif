@@ -286,6 +286,16 @@ export function findVariantByAttributes(
 // Dimension parsing & bucketing for filter sidebar
 // ---------------------------------------------------------------------------
 
+/** Parse fractional inch like "34 3/4" → 34.75, or just "34" → 34 */
+function parseFractionalInch(whole: string, frac?: string): number {
+  let val = parseInt(whole);
+  if (frac) {
+    const parts = frac.split("/");
+    if (parts.length === 2) val += parseInt(parts[0]) / parseInt(parts[1]);
+  }
+  return val;
+}
+
 export function parseProductDimensions(product: Product): { width: number; depth: number } | null {
   // Try structured dimensions field
   const d = product.dimensions;
@@ -299,14 +309,33 @@ export function parseProductDimensions(product: Product): { width: number; depth
 
   const name = product.name || "";
 
-  // Pattern: "NN in. D x NN in. W" (DreamLine style)
+  // Pattern 1: "NN in. D x NN in. W" (DreamLine integer style)
   const dxw = name.match(/(\d+)\s*(?:in\.?|inch|")\s*D\s*x\s*(\d+)\s*(?:in\.?|inch|")\s*W/i);
   if (dxw) {
     const a = parseInt(dxw[1]), b = parseInt(dxw[2]);
     return { width: Math.max(a, b), depth: Math.min(a, b) };
   }
 
-  // Pattern: "NN x NN" generic
+  // Pattern 2: "NN 3/4 inch D x NN 3/8 inch W" (DreamLine fractional style)
+  const fracDxW = name.match(/(\d+)\s*(?:(\d+\/\d+)\s*)?(?:in\.?|inch|")\s*D\s*x\s*(\d+)\s*(?:(\d+\/\d+)\s*)?(?:-\s*(\d+)\s*(?:(\d+\/\d+)\s*)?)?(?:in\.?|inch|")\s*W/i);
+  if (fracDxW) {
+    const depth = Math.round(parseFractionalInch(fracDxW[1], fracDxW[2]));
+    // If there's a range (e.g., "56 3/8 - 60 3/8"), use the upper value
+    const width = fracDxW[5]
+      ? Math.round(parseFractionalInch(fracDxW[5], fracDxW[6]))
+      : Math.round(parseFractionalInch(fracDxW[3], fracDxW[4]));
+    return { width: Math.max(width, depth), depth: Math.min(width, depth) };
+  }
+
+  // Pattern 3: "NN in. L x NN in. W" (freestanding tub Length x Width)
+  const lxw = name.match(/(\d+)\s*(?:(\d+\/\d+)\s*)?(?:in\.?|inch|")\s*L\s*x\s*(\d+)\s*(?:(\d+\/\d+)\s*)?(?:in\.?|inch|")\s*W/i);
+  if (lxw) {
+    const length = Math.round(parseFractionalInch(lxw[1], lxw[2]));
+    const width = Math.round(parseFractionalInch(lxw[3], lxw[4]));
+    return { width: Math.max(length, width), depth: Math.min(length, width) };
+  }
+
+  // Pattern 4: "NN x NN" generic (e.g., "60 x 32", "36x36")
   const nxn = name.match(/(\d+)\s*(?:in\.?|inch|")?\s*[xX×]\s*(\d+)/);
   if (nxn) {
     const a = parseInt(nxn[1]), b = parseInt(nxn[2]);
@@ -315,11 +344,47 @@ export function parseProductDimensions(product: Product): { width: number; depth
     }
   }
 
+  // Pattern 5: 4-digit model number encoding dims (SH6032 → 60x32, ShowerCast 6030 → 60x30)
+  const modelDim = name.match(/(?:SH|VP|MTMK|SMMK|R-?)(\d{2})(\d{2})(?:\b|[^0-9])/i);
+  if (modelDim) {
+    const a = parseInt(modelDim[1]), b = parseInt(modelDim[2]);
+    if (a >= 20 && b >= 20 && a <= 84 && b <= 84) {
+      return { width: Math.max(a, b), depth: Math.min(a, b) };
+    }
+  }
+  // Also match standalone 4-digit numbers like "ShowerCast 6032"
+  const standaloneDim = name.match(/(?:ShowerCast|Kona|Aloha)\s+(\d{2})(\d{2})\b/i);
+  if (standaloneDim) {
+    const a = parseInt(standaloneDim[1]), b = parseInt(standaloneDim[2]);
+    if (a >= 20 && b >= 20 && a <= 84 && b <= 84) {
+      return { width: Math.max(a, b), depth: Math.min(a, b) };
+    }
+  }
+
+  // Pattern 6: Single width "NN" W" or "NN in. W" (shower doors/enclosures — width only)
+  const singleW = name.match(/(\d+(?:\.\d+)?)\s*(?:"|in\.?|inch)\s*W\b/i);
+  if (singleW) {
+    const w = Math.round(parseFloat(singleW[1]));
+    if (w >= 20 && w <= 84) {
+      // For doors/enclosures with only width, set depth=width as a reasonable default
+      return { width: w, depth: w };
+    }
+  }
+
+  // Pattern 7: Range width "NN - NN in. W" (sliding shower doors)
+  const rangeW = name.match(/(\d+)\s*(?:-|to)\s*(\d+)\s*(?:"|in\.?|inch)\s*\.?\s*W\b/i);
+  if (rangeW) {
+    const w = parseInt(rangeW[2]); // Use upper bound
+    if (w >= 20 && w <= 84) {
+      return { width: w, depth: w };
+    }
+  }
+
   return null;
 }
 
-export const WIDTH_BUCKETS = [32, 36, 48, 54, 60, 72];
-export const DEPTH_BUCKETS = [30, 32, 34, 36, 42, 48];
+export const WIDTH_BUCKETS = [32, 36, 42, 48, 54, 60, 66, 72];
+export const DEPTH_BUCKETS = [28, 30, 32, 34, 36, 42, 48];
 
 const BUCKET_TOLERANCE = 2;
 
