@@ -871,7 +871,7 @@ async function callClaude(
     headers: {
       "Content-Type": "application/json",
       "x-api-key": apiKey,
-      "anthropic-version": "2025-04-14",
+      "anthropic-version": "2023-06-01",
       "anthropic-beta": "prompt-caching-2024-07-31",
     },
     body: JSON.stringify(body),
@@ -924,6 +924,8 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, quoteItems } = await req.json();
     const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    console.log(`[Chat] API key present: ${!!apiKey}, length: ${apiKey?.length || 0}, model: ${MODEL}`);
 
     if (apiKey) {
       try {
