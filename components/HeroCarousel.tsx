@@ -51,7 +51,7 @@ export function HeroCarousel() {
           {SLIDES.map((src, i) => (
             <div
               key={i}
-              className="flex-[0_0_100%] min-w-0 relative aspect-[5/3] lg:aspect-[3/1] overflow-hidden"
+              className="flex-[0_0_100%] min-w-0 relative aspect-[4/3] sm:aspect-[5/3] lg:aspect-[3/1] overflow-hidden"
             >
               {/* Ken Burns effect: slow zoom + pan on active slide */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -82,7 +82,7 @@ export function HeroCarousel() {
           <div className="max-w-2xl pointer-events-auto">
             {/* Channel badge */}
             <div
-              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase mb-6 animate-fade-in-up"
+              className="inline-flex items-center gap-2 rounded-full px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold tracking-wider uppercase mb-3 sm:mb-6 animate-fade-in-up"
               style={{
                 backgroundColor: accentColor + "25",
                 color: accentColor,
@@ -93,7 +93,7 @@ export function HeroCarousel() {
               {CHANNEL.id !== "all" ? `${CHANNEL.name} Pro Sales` : "Pro Sales Portal"}
             </div>
 
-            <h1 className="text-3xl sm:text-display-lg md:text-display-xl text-white mb-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
+            <h1 className="text-2xl sm:text-3xl md:text-display-lg lg:text-display-xl text-white mb-2 sm:mb-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
               The Pro Sales
               <br />
               <span
@@ -105,7 +105,7 @@ export function HeroCarousel() {
                 Product Catalog
               </span>
             </h1>
-            <p className="text-base md:text-lg text-white/60 mb-8 max-w-xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "200ms" }}>
+            <p className="text-sm sm:text-base md:text-lg text-white/60 mb-4 sm:mb-8 max-w-xl leading-relaxed animate-fade-in-up" style={{ animationDelay: "200ms" }}>
               Search. Quote. Close. {CHANNEL.tagline}
             </p>
 
@@ -115,17 +115,17 @@ export function HeroCarousel() {
                 style={{ background: `linear-gradient(135deg, ${accentColor}40, ${accentColor}20, ${accentColor}40)` }}
               />
               <div className="relative flex items-center bg-white rounded-xl shadow-elevated overflow-hidden">
-                <Search className="w-5 h-5 text-gray-400 ml-5 shrink-0" />
+                <Search className="w-4 sm:w-5 h-4 sm:h-5 text-gray-400 ml-3 sm:ml-5 shrink-0" />
                 <input
                   type="text"
                   value={heroSearch}
                   onChange={(e) => setHeroSearch(e.target.value)}
                   placeholder="Search products, SKUs, brands..."
-                  className="flex-1 px-4 py-4 md:py-5 text-gray-900 placeholder:text-gray-400 text-base md:text-lg bg-transparent focus:outline-none"
+                  className="flex-1 px-3 sm:px-4 py-3 sm:py-4 md:py-5 text-gray-900 placeholder:text-gray-400 text-sm sm:text-base md:text-lg bg-transparent focus:outline-none"
                 />
                 <button
                   type="submit"
-                  className="font-bold px-6 md:px-8 py-4 md:py-5 transition-all shrink-0 text-sm tracking-wide bg-navy text-white hover:bg-navy-light"
+                  className="font-bold px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 transition-all shrink-0 text-sm tracking-wide bg-navy text-white hover:bg-navy-light"
                 >
                   Search
                 </button>
