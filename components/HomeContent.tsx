@@ -66,8 +66,8 @@ export function HomeContent() {
       {/*  BRAND LOGO BAR — frosted glass with warm bg                 */}
       {/* ============================================================ */}
       <section className="bg-white border-b border-gray-100 relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-5">
-          <div className="flex items-center justify-center gap-4 sm:gap-8 md:gap-12 flex-wrap">
+        <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-3 sm:py-5">
+          <div className="flex items-center sm:justify-center gap-6 sm:gap-8 md:gap-12 overflow-x-auto sm:flex-wrap scrollbar-hide">
             {BRAND_NAMES.map((name) => {
               const brand = BRANDS[name];
               if (!brand || !brand.logo) return null;
@@ -96,9 +96,9 @@ export function HomeContent() {
       {/* ============================================================ */}
       {/*  SHOP BY CATEGORY — Bento grid with varied sizes             */}
       {/* ============================================================ */}
-      <section className="py-10 md:py-20 bg-surface-sunken relative">
+      <section className="py-8 sm:py-10 md:py-20 bg-surface-sunken relative">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="mb-8 md:mb-12">
+          <div className="mb-5 sm:mb-8 md:mb-12">
             <p className="text-label mb-3" style={{ color: accentColor }}>Browse catalog</p>
             <h2 className="text-2xl md:text-display-lg text-gray-900">
               Shop by Category

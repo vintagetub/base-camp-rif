@@ -137,6 +137,12 @@ h1, h2, h3, h4 {
 ::-webkit-scrollbar-thumb { background: var(--color-border-default); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--color-text-tertiary); }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* ------------------------------------------------------------------ */
 /*  Animations                                                         */
 /* ------------------------------------------------------------------ */
