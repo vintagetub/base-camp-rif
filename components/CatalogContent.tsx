@@ -56,7 +56,7 @@ export function CatalogContent() {
 
   const allResults = useMemo(() => filterProducts({ ...filters, parentsOnly: true }), [filters]);
   const facets = useMemo(() => computeFacets({ ...filters, parentsOnly: true }), [filters]);
-  const { brands, categories, colors, installationTypes, finishes, frameTypes, glassTypes } = facets;
+  const { brands, categories, colors, installationTypes, finishes, frameTypes, glassTypes, widths, depths } = facets;
 
   const totalPages = Math.max(1, Math.ceil(allResults.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -78,11 +78,17 @@ export function CatalogContent() {
     handleFilterChange({ ...filters, [key]: current.filter((v) => v !== value) });
   };
 
-  const activeFilters: { key: ArrayFilterKey | "adaOnly" | "hasVideo"; label: string; value: string }[] = [];
+  const activeFilters: { key: ArrayFilterKey | "widths" | "depths" | "adaOnly" | "hasVideo"; label: string; value: string }[] = [];
   (["brands", "categories", "colors", "installationTypes", "finishes", "frameTypes", "glassTypes"] as ArrayFilterKey[]).forEach((key) => {
     (filters[key] || []).forEach((value) => {
       activeFilters.push({ key, label: value, value });
     });
+  });
+  (filters.widths || []).forEach((v) => {
+    activeFilters.push({ key: "widths", label: `W: ${v}"`, value: String(v) });
+  });
+  (filters.depths || []).forEach((v) => {
+    activeFilters.push({ key: "depths", label: `D: ${v}"`, value: String(v) });
   });
   if (filters.adaOnly) activeFilters.push({ key: "adaOnly", label: "ADA Compliant", value: "ada" });
   if (filters.hasVideo) activeFilters.push({ key: "hasVideo", label: "Has Video", value: "video" });
@@ -120,6 +126,8 @@ export function CatalogContent() {
           finishes={finishes}
           frameTypes={frameTypes}
           glassTypes={glassTypes}
+          widths={widths}
+          depths={depths}
           filters={filters}
           onFilterChange={handleFilterChange}
           totalResults={allResults.length}
@@ -140,6 +148,10 @@ export function CatalogContent() {
                       handleFilterChange({ ...filters, adaOnly: undefined });
                     } else if (f.key === "hasVideo") {
                       handleFilterChange({ ...filters, hasVideo: undefined });
+                    } else if (f.key === "widths") {
+                      handleFilterChange({ ...filters, widths: (filters.widths || []).filter((v) => v !== Number(f.value)) });
+                    } else if (f.key === "depths") {
+                      handleFilterChange({ ...filters, depths: (filters.depths || []).filter((v) => v !== Number(f.value)) });
                     } else {
                       removeArrayFilter(f.key, f.value);
                     }

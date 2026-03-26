@@ -282,6 +282,67 @@ export function findVariantByAttributes(
   });
 }
 
+// ---------------------------------------------------------------------------
+// Dimension parsing & bucketing for filter sidebar
+// ---------------------------------------------------------------------------
+
+export function parseProductDimensions(product: Product): { width: number; depth: number } | null {
+  // Try structured dimensions field
+  const d = product.dimensions;
+  if (d) {
+    const w = parseFloat(d.width);
+    const dp = parseFloat(d.depth);
+    if (w > 0 && dp > 0) {
+      return { width: Math.max(w, dp), depth: Math.min(w, dp) };
+    }
+  }
+
+  const name = product.name || "";
+
+  // Pattern: "NN in. D x NN in. W" (DreamLine style)
+  const dxw = name.match(/(\d+)\s*(?:in\.?|inch|")\s*D\s*x\s*(\d+)\s*(?:in\.?|inch|")\s*W/i);
+  if (dxw) {
+    const a = parseInt(dxw[1]), b = parseInt(dxw[2]);
+    return { width: Math.max(a, b), depth: Math.min(a, b) };
+  }
+
+  // Pattern: "NN x NN" generic
+  const nxn = name.match(/(\d+)\s*(?:in\.?|inch|")?\s*[xX×]\s*(\d+)/);
+  if (nxn) {
+    const a = parseInt(nxn[1]), b = parseInt(nxn[2]);
+    if (a >= 20 && b >= 20 && a <= 84 && b <= 84) {
+      return { width: Math.max(a, b), depth: Math.min(a, b) };
+    }
+  }
+
+  return null;
+}
+
+export const WIDTH_BUCKETS = [32, 36, 48, 54, 60, 72];
+export const DEPTH_BUCKETS = [30, 32, 34, 36, 42, 48];
+
+const BUCKET_TOLERANCE = 2;
+
+export function getWidthBucket(product: Product): number | null {
+  const dims = parseProductDimensions(product);
+  if (!dims) return null;
+  for (const b of WIDTH_BUCKETS) {
+    if (Math.abs(dims.width - b) <= BUCKET_TOLERANCE) return b;
+  }
+  return null;
+}
+
+export function getDepthBucket(product: Product): number | null {
+  const dims = parseProductDimensions(product);
+  if (!dims) return null;
+  for (const b of DEPTH_BUCKETS) {
+    if (Math.abs(dims.depth - b) <= BUCKET_TOLERANCE) return b;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+
 export interface FilterOptions {
   brands?: string[];
   categories?: string[];
@@ -291,6 +352,8 @@ export interface FilterOptions {
   finishes?: string[];
   frameTypes?: string[];
   glassTypes?: string[];
+  widths?: number[];
+  depths?: number[];
   priceMin?: number;
   priceMax?: number;
   hasImages?: boolean;
@@ -381,6 +444,18 @@ export function filterProducts(options: FilterOptions): Product[] {
     results = results.filter((p) =>
       options.glassTypes!.includes(p.specifications?.["glass type"] || "")
     );
+  }
+  if (options.widths?.length) {
+    results = results.filter((p) => {
+      const bucket = getWidthBucket(p);
+      return bucket !== null && options.widths!.includes(bucket);
+    });
+  }
+  if (options.depths?.length) {
+    results = results.filter((p) => {
+      const bucket = getDepthBucket(p);
+      return bucket !== null && options.depths!.includes(bucket);
+    });
   }
   if (options.adaOnly) {
     results = results.filter((p) => p.specifications?.ada === "Yes");
@@ -519,6 +594,8 @@ export interface FacetCounts {
   finishes: string[];
   frameTypes: string[];
   glassTypes: string[];
+  widths: { value: number; count: number }[];
+  depths: { value: number; count: number }[];
 }
 
 export function computeFacets(filters: FilterOptions): FacetCounts {
@@ -581,5 +658,27 @@ export function computeFacets(filters: FilterOptions): FacetCounts {
   forGlass.forEach((p) => { const f = p.specifications?.["glass type"]; if (f) glassSet.add(f); });
   const glassTypes = Array.from(glassSet).sort();
 
-  return { brands, categories, colors, installationTypes, finishes, frameTypes, glassTypes };
+  // Width facet
+  const forWidths = applyFiltersExcept("widths");
+  const widthMap = new Map<number, number>();
+  forWidths.forEach((p) => {
+    const bucket = getWidthBucket(p);
+    if (bucket !== null) widthMap.set(bucket, (widthMap.get(bucket) || 0) + 1);
+  });
+  const widths = Array.from(widthMap.entries())
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => a.value - b.value);
+
+  // Depth facet
+  const forDepths = applyFiltersExcept("depths");
+  const depthMap = new Map<number, number>();
+  forDepths.forEach((p) => {
+    const bucket = getDepthBucket(p);
+    if (bucket !== null) depthMap.set(bucket, (depthMap.get(bucket) || 0) + 1);
+  });
+  const depths = Array.from(depthMap.entries())
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => a.value - b.value);
+
+  return { brands, categories, colors, installationTypes, finishes, frameTypes, glassTypes, widths, depths };
 }
