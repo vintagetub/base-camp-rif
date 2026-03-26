@@ -508,6 +508,28 @@ export function getCompatibleProducts(product: Product): CompatibleGroup[] {
     }
   }
 
+  // ---- Layer 6: Brand-match fallback ----
+  // If we have fewer than 2 groups, add same-brand products of compatible types
+  if (groupMap.size < 2) {
+    const compatTypes = getCompatibleTypes(sourceType, product);
+    for (const candidate of getCatalogProducts()) {
+      if (seen.has(candidate.id)) continue;
+      const candidateType = getNormalizedType(candidate);
+      if (!compatTypes.includes(candidateType)) continue;
+      if (candidateType === sourceType && !isBathtub(sourceType)) continue;
+
+      const sameBrand = candidate.brand === product.brand;
+      const hasImages = candidate.images.length > 0;
+      if (!sameBrand && !hasImages) continue;
+
+      addMatch({
+        product: candidate,
+        score: sameBrand ? 35 : 25,
+        matchType: sameBrand ? "brand-fallback" : "type-fallback",
+      });
+    }
+  }
+
   // ---- Build result groups ----
   const result: CompatibleGroup[] = [];
   groupMap.forEach((scored, category) => {

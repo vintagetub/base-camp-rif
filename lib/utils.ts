@@ -47,6 +47,7 @@ export function normalizeBrand(brand: string): string {
     Coastal: "Coastal Shower Doors",
     Unknown: "Other",
   };
+  if (!brand) return "Other";
   return brandMap[brand] || brand;
 }
 
@@ -55,6 +56,96 @@ export function simplifyCategory(category: string): string {
   // Remove parent category prefix
   const parts = category.split(" / ");
   return parts[parts.length - 1] || "Uncategorized";
+}
+
+/**
+ * Resolve a product's display category using all available data:
+ *  1. Raw `category` field (after simplification)
+ *  2. `productType` field mapped to a display category
+ *  3. Name-based inference
+ *  4. "Other" as last resort
+ */
+export function resolveCategory(product: {
+  category?: string;
+  productType?: string;
+  name?: string;
+}): string {
+  // 1. Use category if present
+  const cat = product.category ? simplifyCategory(product.category) : "";
+  if (cat && cat !== "Uncategorized") return cat;
+
+  // 2. Fall back to productType → display category mapping
+  if (product.productType) {
+    const mapped = mapProductTypeToCategory(product.productType);
+    if (mapped) return mapped;
+  }
+
+  // 3. Name-based inference
+  if (product.name) {
+    const inferred = inferCategoryFromName(product.name);
+    if (inferred) return inferred;
+  }
+
+  return "Other";
+}
+
+const PRODUCT_TYPE_TO_CATEGORY: Record<string, string> = {
+  "Shower Door": "Shower Doors",
+  "Shower Door and Base": "Shower Door and Base",
+  "Shower Door, Base and Backwalls": "Shower Door, Base and Walls",
+  "Shower Enclosure": "Shower Enclosures",
+  "Shower Enclosure and Base": "Shower Enclosure and Base",
+  "Shower Enclosure, Base and Backwalls": "Shower Door, Base and Walls",
+  "Shower Base": "Shower Bases",
+  "Bathtub": "Bathtubs",
+  "Tub": "Bathtubs",
+  "Tub Shower": "Showers",
+  "Backwall": "Wall",
+  "Sinks": "Sinks",
+  "Shower Head": "Fixtures",
+  "Faucet - Shower": "Fixtures",
+  "Home Spa": "Fixtures",
+  "Shower Kit": "Shower Kit",
+};
+
+function mapProductTypeToCategory(productType: string): string | null {
+  return PRODUCT_TYPE_TO_CATEGORY[productType] || null;
+}
+
+function inferCategoryFromName(name: string): string | null {
+  const lower = name.toLowerCase();
+
+  // Order matters — check more specific patterns first
+  if (lower.includes("shower door") && lower.includes("base") && lower.includes("wall"))
+    return "Shower Door, Base and Walls";
+  if (lower.includes("shower door") && lower.includes("base"))
+    return "Shower Door and Base";
+  if (lower.includes("shower enclosure") && lower.includes("base"))
+    return "Shower Enclosure and Base";
+  if (lower.includes("shower enclosure") || lower.includes("shower stall"))
+    return "Shower Enclosures";
+  if (lower.includes("shower door"))
+    return "Shower Doors";
+  if (lower.includes("shower base") || lower.includes("shower pan"))
+    return "Shower Bases";
+  if (lower.includes("shower head") || lower.includes("showerhead"))
+    return "Fixtures";
+  if (lower.includes("shower kit"))
+    return "Shower Kit";
+  if (lower.includes("shower"))
+    return "Showers";
+  if (lower.includes("tub door"))
+    return "Tub Door";
+  if (lower.includes("bathtub") || lower.includes("alcove") || lower.includes("soaking"))
+    return "Bathtubs";
+  if (lower.includes("wall panel") || lower.includes("backwall") || lower.includes("back wall"))
+    return "Wall";
+  if (lower.includes("faucet"))
+    return "Fixtures";
+  if (lower.includes("sink") || lower.includes("vanity"))
+    return "Sinks";
+
+  return null;
 }
 
 export function slugify(text: string): string {

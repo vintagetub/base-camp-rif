@@ -1,5 +1,5 @@
 import productData from "@/data/product_data.json";
-import { normalizeBrand, simplifyCategory } from "./utils";
+import { normalizeBrand, resolveCategory } from "./utils";
 import { CHANNEL, isBrandInChannel, IS_CHANNEL_SPECIFIC } from "./channel";
 
 export interface ProductSpecifications {
@@ -93,7 +93,7 @@ const _allNormalized: Product[] = (productData as any[]).map((p) => ({
   brand: normalizeBrand(p.brand || "Other"),
   name: p.name || p.shortName || p.sku || p.id || "Unnamed Product",
   shortName: p.shortName || p.name || p.sku || p.id || "Unnamed",
-  category: simplifyCategory(p.category || ""),
+  category: resolveCategory({ category: p.category, productType: p.productType, name: p.name || p.shortName }),
   productType: p.productType || "",
   collection: p.collection || "",
   color: p.color || "",

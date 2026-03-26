@@ -13,6 +13,9 @@ import {
   Square,
   Layers,
   LayoutGrid,
+  Droplets,
+  Package,
+  Wrench,
 } from "lucide-react";
 import { HeroCarousel } from "./HeroCarousel";
 import { Button } from "./ui/button";
@@ -26,11 +29,14 @@ import { cn } from "@/lib/utils";
 /*  Category config                                                    */
 /* ------------------------------------------------------------------ */
 const CATEGORIES = [
-  { name: "Bathtubs", icon: Bath, gradient: "from-blue-600 to-blue-800" },
   { name: "Shower Doors", icon: DoorOpen, gradient: "from-navy to-navy-light" },
+  { name: "Bathtubs", icon: Bath, gradient: "from-blue-600 to-blue-800" },
   { name: "Shower Bases", icon: Square, gradient: "from-amber-500 to-amber-700" },
-  { name: "Shower Doors & Enclosures", icon: Layers, gradient: "from-emerald-600 to-emerald-800" },
-  { name: "Wall Systems", icon: LayoutGrid, gradient: "from-violet-600 to-violet-800" },
+  { name: "Shower Enclosures", icon: Layers, gradient: "from-emerald-600 to-emerald-800" },
+  { name: "Showers", icon: Droplets, gradient: "from-cyan-500 to-cyan-700" },
+  { name: "Wall", icon: LayoutGrid, gradient: "from-violet-600 to-violet-800" },
+  { name: "Sinks", icon: Package, gradient: "from-slate-500 to-slate-700" },
+  { name: "Fixtures", icon: Wrench, gradient: "from-rose-500 to-rose-700" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -39,9 +45,34 @@ const CATEGORIES = [
 export function HomeContent() {
 
   const catalogProducts = getCatalogProducts();
-  const featured = catalogProducts
-    .filter((p) => p.images.length > 0 && (p.pricing.basePrice || p.pricing.listPrice))
-    .slice(0, 8);
+
+  // Featured: products with images + pricing, diverse across brands
+  const featured = (() => {
+    const candidates = catalogProducts
+      .filter((p) => p.images.length > 0 && (p.pricing.basePrice || p.pricing.listPrice))
+      .sort((a, b) => {
+        const imgDiff = b.images.length - a.images.length;
+        if (imgDiff !== 0) return imgDiff;
+        return a.brand.localeCompare(b.brand);
+      });
+
+    const picked: typeof candidates = [];
+    const usedBrands = new Set<string>();
+    // First pass: one per brand
+    for (const p of candidates) {
+      if (picked.length >= 8) break;
+      if (!usedBrands.has(p.brand)) {
+        picked.push(p);
+        usedBrands.add(p.brand);
+      }
+    }
+    // Second pass: fill remaining slots
+    for (const p of candidates) {
+      if (picked.length >= 8) break;
+      if (!picked.includes(p)) picked.push(p);
+    }
+    return picked;
+  })();
 
   const brandCounts = new Map<string, number>();
   catalogProducts.forEach((p) => {
@@ -104,26 +135,16 @@ export function HomeContent() {
               Shop by Category
             </h2>
           </div>
-          {/* Bento grid: first 2 items span tall, remaining are compact */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 stagger-children">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stagger-children">
             {CATEGORIES.map(({ name, icon: Icon, gradient }, idx) => {
               const count = categoryCounts.get(name) || 0;
-              // First two items span 2 cols, first one also spans 2 rows on lg
-              const spanClass = idx === 0
-                ? "col-span-2 row-span-2"
-                : idx === 1
-                  ? "col-span-2"
-                  : "col-span-1 md:col-span-2 lg:col-span-2";
               return (
                 <Link
                   key={name}
                   href={`/products?category=${encodeURIComponent(name)}`}
-                  className={cn(
-                    "group relative rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-elevated",
-                    spanClass
-                  )}
+                  className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-elevated"
                 >
-                  <div className={`bg-gradient-to-br ${gradient} p-4 sm:p-6 md:p-8 flex flex-col ${idx === 0 ? "h-full justify-end" : "items-start"} relative`}>
+                  <div className={`bg-gradient-to-br ${gradient} p-4 sm:p-6 md:p-8 flex flex-col items-start relative`}>
                     {/* Decorative geometric accent */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
