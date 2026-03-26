@@ -131,7 +131,7 @@ export default function SizeGuidePage() {
             ))}
           </div>
           <div className="text-center mt-8">
-            <Link href="/products?category=Shower+Base">
+            <Link href="/products?category=Shower+Bases">
               <Button variant="amber">
                 Shop Shower Bases <ArrowRight className="w-4 h-4" />
               </Button>
@@ -214,27 +214,39 @@ export default function SizeGuidePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16">
+      <section className="py-10 md:py-20">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <div className="bg-navy rounded-3xl p-8 md:p-12 text-center text-white">
-            <CheckCircle2 className="w-12 h-12 text-amber mx-auto mb-4" />
-            <h2 className="text-3xl font-bold mb-3">Ready to Find Your Shower Base?</h2>
-            <p className="text-white/60 mb-8 max-w-lg mx-auto">
-              Browse our full catalog of shower bases with detailed specifications
-              and dimensions to find the perfect fit.
-            </p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <Link href="/products?category=Shower+Base">
-                <Button variant="amber" size="lg">
-                  Shop Shower Bases <ArrowRight className="w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/products">
-                <Button variant="outline" size="lg" className="border-white/30 text-white hover:bg-white/10">
-                  Browse All Products
-                </Button>
-              </Link>
+          <div className="gradient-hero rounded-2xl md:rounded-3xl p-6 sm:p-10 md:p-16 text-center text-white relative overflow-hidden texture-noise">
+            <div className="relative z-10">
+              <div className="w-16 h-16 rounded-2xl bg-amber/25 flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-8 h-8 text-amber" />
+              </div>
+              <h2 className="text-2xl md:text-display-lg text-white mb-4">Ready to Find Your Shower Base?</h2>
+              <p className="text-white/80 mb-10 max-w-lg mx-auto leading-relaxed">
+                Browse our full catalog of shower bases with detailed specifications
+                and dimensions to find the perfect fit.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link href="/products?category=Shower+Bases">
+                  <Button variant="amber" size="lg" className="shadow-lg hover:shadow-xl transition-shadow">
+                    Shop Shower Bases
+                    <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link href="/products">
+                  <Button
+                    variant="ghost"
+                    size="lg"
+                    className="border border-white/30 text-white hover:bg-white/10 hover:border-white/40"
+                  >
+                    Browse All Products
+                  </Button>
+                </Link>
+              </div>
             </div>
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/3 rounded-full -translate-y-1/3 translate-x-1/3" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/3 rounded-full translate-y-1/3 -translate-x-1/3" />
           </div>
         </div>
       </section>
